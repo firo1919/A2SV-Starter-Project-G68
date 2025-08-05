@@ -1,1 +1,61 @@
 @import "tailwindcss";
+
+@theme {
+	/* Font styles */
+	--font-inter: var(--font-inter), sans-serif;
+	--font-poppins: var(--font-poppins), sans-serif;
+
+	/* Color styles */
+	--color-alizarin-crimson: rgba(220, 38, 38, 1);
+	--color-athens-gray: rgba(249, 250, 251, 1);
+	--color-athens-gray: rgba(229, 231, 235, 1);
+	--color-athens-gray: rgba(243, 244, 246, 1);
+	--color-beeswax: rgba(254, 249, 195, 1);
+	--color-black: rgba(0, 0, 0, 1);
+	--color-cornflower-blue: rgba(99, 102, 241, 1);
+	--color-crown-of-thorns: rgba(127, 29, 29, 1);
+	--color-dodger-blue: rgba(59, 130, 246, 1);
+	--color-ebony: rgba(17, 24, 39, 1);
+	--color-ebony-clay: rgba(31, 41, 55, 1);
+	--color-gallery: rgba(224, 231, 255, 1);
+	--color-governor-bay: rgba(67, 56, 202, 1);
+	--color-gray-chateau: rgba(156, 163, 175, 1);
+	--color-iron-40: rgba(212, 212, 216, 0.4000000059604645);
+	--color-jewel: rgba(22, 101, 52, 1);
+	--color-korma: rgba(133, 77, 14, 1);
+	--color-minsk: rgba(49, 46, 129, 1);
+	--color-mischka: rgba(209, 213, 219, 1);
+	--color-mountain-meadow: rgba(34, 197, 94, 1);
+	--color-oxford-blue: rgba(55, 65, 81, 1);
+	--color-pale-sky: rgba(107, 114, 128, 1);
+	--color-pattens-blue: rgba(219, 234, 254, 1);
+	--color-pattens-blue: rgba(219, 234, 254, 1);
+	--color-periwinkle: rgba(199, 210, 254, 1);
+	--color-river-bed: rgba(75, 85, 99, 1);
+	--color-royal-blue: rgba(79, 70, 229, 1);
+	--color-salem: rgba(22, 163, 74, 1);
+	--color-scandal: rgba(219, 234, 254, 1);
+	--color-scandal: rgba(219, 234, 254, 1);
+	--color-shamrock: rgba(74, 222, 128, 1);
+	--color-white: rgba(255, 255, 255, 1);
+	--color-white-02: rgba(255, 255, 255, 0.0020000000949949026);
+	--color-white-80: rgba(255, 255, 255, 0.800000011920929);
+	--color-white-athens-gray: rgba(255, 255, 255, 1);
+	--color-zircon: rgba(238, 242, 255, 1);
+	--color-zumthor: rgba(224, 231, 255, 1);
+	--color-zumthor: rgba(224, 231, 255, 1);
+}
+@layer base {
+	body {
+		@apply font-inter bg-athens-gray;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		@apply font-poppins;
+	}
+}
