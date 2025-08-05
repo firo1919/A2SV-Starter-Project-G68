@@ -17,11 +17,11 @@ export default auth((req) => {
 	}
 	if (isAuthenticated && !isPublicRoute) {
 		if (role && !req.nextUrl.pathname.startsWith(rolePaths[role as keyof typeof rolePaths])) {
-			return Response.redirect(newUrl);
+			return Response.redirect(new URL("/denied", req.nextUrl.origin));
 		}
 	}
 });
 
 export const config = {
-	matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+	matcher: ["/((?!api|_next/static|_next/image|favicon.ico|images).*)"],
 };
