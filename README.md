@@ -48,7 +48,7 @@ A system designed to replace A2SVs application process, its a complete, responsi
 1. **Clone the repository**
 
     ```bash
-    git clone https://github.com/your-username/A2SV-Starter-Project-G68.git
+    git clone https://github.com/firo1919/A2SV-Starter-Project-G68.git
     cd A2SV-Starter-Project-G68
     ```
 
@@ -61,7 +61,7 @@ A system designed to replace A2SVs application process, its a complete, responsi
 3. **Set up environment variables**
 
     ```bash
-    cp .env.local
+    cp example.env .env.local
     ```
 
     Then edit `.env.local` with your configuration values.
@@ -74,8 +74,6 @@ A system designed to replace A2SVs application process, its a complete, responsi
 
 5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
-
-## Environment Variables
 
 ## Running Tests
 
