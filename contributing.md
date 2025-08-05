@@ -1,130 +1,127 @@
 # 🌟 Contributing to the A2SV Application Platform – Starter Project
 
-Welcome! 🎉 We’re building the A2SV Application Platform MVP together.  
-This document explains how to contribute effectively so our codebase stays clean, consistent, and professional.
 
----
+## 1️⃣ Branching Strategy
 
-## 📂 Project Folder Structure
+### Main Branch
 
-Follow this structure when adding files:
+-   **`main`** is the source of truth.
+-   Always in a **working, stable state**.
+-   **No direct commits** to `main`.
 
-### Folder structure
--   public/
-    -   images/
--   src/
-    -   app/
-        -   (routes)
-        -   components/
-	- ui/
-    -   hooks/
-    -   lib/
-        -   redux/
-            -   api/
-            -   clientApi.ts
-            -   slices/
-            -   [sliceName].ts
-            -   types/
-            -   [typeName].ts
-            -   utils/
-            -   [utilityFunction].ts
-    -   providers/
-        -   ReduxProvider.tsx
-        -   ThemeProvider.tsx
-    -   styles/
-        -   globals.css
-        -   theme.css
-    -   types/
-        -   [globalTypeName].ts
-    -   utils/
-        -   [utilityFunction].ts
-    -   tests/
-        -   [FeatureOrComponentName]/
-            -   [componentOrPage].test.tsx
+### Feature Branch Workflow
 
-### Routing structure
--   /admin
--   /manager
--   /reviewer
--   /applicant
--   (public)
-    -   /
-    -   /login
-    -   /register-user
-    -   /reset-password
-    -   /forgot-password
+1. **Create branch** from the latest `main`:
+    ```bash
+    git checkout main
+    git pull origin main
+    git checkout -b feat/your-feature-name
+    ```
 
-### Dependencies
-@hookform/resolvers
-@reduxjs/toolkit
-@tailwindcss/postcss
-@testing-library/dom
-@testing-library/jest-dom
-@testing-library/react
-cypress
-eslint-plugin-jest-dom
-eslint-plugin-testing-library
-jest-environment-jsdom
-jest
-next-auth@beta
-react-hook-form
-react-redux
-tailwindcss
-zod@4.0.14
+## 2️⃣ Naming Conventions
 
+### Branch Naming
 
----
+**Format**: `type_short-description`
 
-## 🚀 Development Workflow
+**Types**:
 
-1. **Branching**
-   - Use feature branches:  
-     `feature/<feature-name>` for features  
-     `fix/<bug-name>` for bug fixes
-   - Keep `main` branch stable and deployment-ready
+-   **`feat`** – New feature (e.g., `feat_user-login-form`)
+-   **`fix`** – Bug fix (e.g., `fix_navbar-responsiveness`)
+-   **`docs`** – Documentation changes (e.g., `docs_update-readme`)
+-   **`style`** – Formatting only, no logic changes (e.g., `style_format-css`)
+-   **`refactor`** – Code changes without altering behavior (e.g., `refactor_simplify-auth`)
+-   **`test`** – Adding/fixing tests (e.g., `test_add-user-tests`)
 
-2. **Commits**
-   - Use clear, descriptive messages:
-     ```
-     feat: implement applicant dashboard
-     fix: correct API endpoint for login
-     ```
-   - Commit frequently, but only working code
+### Commit Messages
 
-3. **Pull Requests**
-   - Open PRs from your branch into `main`
-   - Keep them focused on a single feature/fix
-   - Link related issues and user stories
-   - At least one teammate must review before merging
+Follow Conventional Commits format:
 
----
-
-## 🎨 Design & Styling
-
-- **Frameworks:** Next.js + React + TypeScript
-- **Styling:** Tailwind CSS only
-- **Mobile-first:** Start from small screens → tablet → desktop
-- **Figma:** Follow [Figma design](https://www.figma.com/design/7bYFK1UxLDudzX78P414g5/G6-Web-Team---a2SV-application-Platform?node-id=0-1&p=f&t=AUw1sxdSdng0wz6U-0)
-- Small UI enhancements are okay if they improve usability
-
----
-
-## 📡 API Integration
-
-- Use your team’s backend URL:
-https://a2sv-application-platform-backend-team[TEAM_NO].onrender.com
-
-- Check `/docs` for API endpoints
-- Test all endpoints with Postman or Swagger before integration
-
----
-
-## ✅ Testing
-
-- Tests live in `src/tests/[FeatureOrComponentName]/`
-- Use **Jest** + **React Testing Library**
-- Ensure all tests pass before merging:
 ```bash
-npm run test
+<type>: <short description>
+```
 
----
+**Example Messages**:
+
+```
+feat: add password reset functionality
+fix: prevent form submission on invalid email
+docs: update README with setup steps
+refactor: simplify authentication logic
+style: format code with Prettier
+```
+
+## 3️⃣ Pull Requests (PRs)
+
+### Creating a PR
+
+1. **Push your branch** to GitHub:
+
+    ```bash
+    git push -u origin feat/your-branch-name
+    ```
+
+2. **Open a PR** from your branch into `main`.
+
+3. **Fill in the PR description** using this template:
+
+    ```markdown
+    ### Description
+
+    Explain the changes and why they are needed.
+
+    ### Related Issue
+
+    Closes #<issue-number>
+
+### Review Process
+
+-   Request at least **1–2 teammate reviews**.
+-   Be open to feedback.
+-   Approve only if the PR meets requirements and passes tests.
+
+### Merging
+
+-   Merge only after approvals and passing checks.
+-   Delete the branch after merging.
+
+## 4️⃣ Handling Merge Conflicts
+
+### Steps:
+
+1. **Update local main**:
+
+    ```bash
+    git checkout main
+    git pull origin main
+    ```
+
+2. **Switch to your branch**:
+
+    ```bash
+    git checkout feat/your-branch-name
+    git merge main
+    ```
+
+3. **Fix conflicts** in files:
+
+    ```markdown
+    <<<<<<< HEAD
+    // Your branch code
+    =======
+    // main branch code
+
+    > > > > > > > main
+    ```
+
+    Remove conflict markers and decide the final code.
+
+4. **Commit and push**:
+    ```bash
+    git add .
+    git commit -m "chore: resolve merge conflicts with main"
+    git push
+    ```
+
+
+**Happy coding! 🚀**
