@@ -1,6 +1,5 @@
 # 🌟 Contributing to the A2SV Application Platform – Starter Project
 
-
 ## 1️⃣ Branching Strategy
 
 ### Main Branch
@@ -26,12 +25,12 @@
 
 **Types**:
 
--   **`feat`** – New feature (e.g., `feat_user-login-form`)
--   **`fix`** – Bug fix (e.g., `fix_navbar-responsiveness`)
--   **`docs`** – Documentation changes (e.g., `docs_update-readme`)
--   **`style`** – Formatting only, no logic changes (e.g., `style_format-css`)
--   **`refactor`** – Code changes without altering behavior (e.g., `refactor_simplify-auth`)
--   **`test`** – Adding/fixing tests (e.g., `test_add-user-tests`)
+-   **`feat`** – New feature (e.g., `feat/user-login-form`)
+-   **`fix`** – Bug fix (e.g., `fix/navbar-responsiveness`)
+-   **`docs`** – Documentation changes (e.g., `docs/update-readme`)
+-   **`style`** – Formatting only, no logic changes (e.g., `style/format-css`)
+-   **`refactor`** – Code changes without altering behavior (e.g., `refactor/simplify-auth`)
+-   **`test`** – Adding/fixing tests (e.g., `test/add-user-tests`)
 
 ### Commit Messages
 
@@ -73,6 +72,7 @@ style: format code with Prettier
     ### Related Issue
 
     Closes #<issue-number>
+    ```
 
 ### Review Process
 
@@ -103,6 +103,8 @@ style: format code with Prettier
     git merge main
     ```
 
+    - Its recommended to perform this before creating a PR
+
 3. **Fix conflicts** in files:
 
     ```markdown
@@ -122,6 +124,5 @@ style: format code with Prettier
     git commit -m "chore: resolve merge conflicts with main"
     git push
     ```
-
 
 **Happy coding! 🚀**
