@@ -122,6 +122,3 @@ style: format code with Prettier
     git commit -m "chore: resolve merge conflicts with main"
     git push
     ```
-
-
-**Happy coding! 🚀**
