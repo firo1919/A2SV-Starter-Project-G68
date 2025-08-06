@@ -2,6 +2,7 @@ import AuthProvider from "@/providers/AuthProvider";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
+import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
 	title: "Application Platform",
@@ -29,7 +30,10 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<AuthProvider>
-				<body className={`${poppins.variable} ${inter.variable}`}>{children}</body>
+				<body className={`${poppins.variable} ${inter.variable} min-h-screen flex flex-col`}>
+					<main className="grow">{children}</main>
+					<Footer />
+				</body>
 			</AuthProvider>
 		</html>
 	);
