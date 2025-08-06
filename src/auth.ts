@@ -66,6 +66,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			}
 		},
 		session({ session, token }) {
+			if(session)
 			session.user.role = token.role;
 			return session;
 		},
