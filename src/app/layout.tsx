@@ -29,7 +29,6 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className="bg-[#F3F4F6]">{children}</body>
 			<AuthProvider>
 				<body className={`${poppins.variable} ${inter.variable} min-h-screen flex flex-col`}>
 					<main className="grow">{children}</main>
