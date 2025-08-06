@@ -93,6 +93,7 @@ npm run test:watch
 
 ### E2E Tests (Cypress)
 
+
 ```bash
 npm run cypress:open
 ```
