@@ -1,6 +1,5 @@
 # 🌟 Contributing to the A2SV Application Platform – Starter Project
 
-
 ## 1️⃣ Branching Strategy
 
 ### Main Branch
@@ -73,6 +72,7 @@ style: format code with Prettier
     ### Related Issue
 
     Closes #<issue-number>
+    ```
 
 ### Review Process
 
@@ -118,7 +118,7 @@ style: format code with Prettier
 
 4. **Commit and push**:
     ```bash
-    git add .
-    git commit -m "chore: resolve merge conflicts with main"
-    git push
+     git add .
+     git commit -m "chore: resolve merge conflicts with main"
+     git push
     ```
