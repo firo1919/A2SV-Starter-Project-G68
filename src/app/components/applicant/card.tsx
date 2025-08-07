@@ -75,7 +75,6 @@ export default function Card({ type }: CardProps) {
 				</>
 			) : (
 				<>
-					{/* Progress Cards (unchanged) */}
 					<div className="shadow-xl bg-white rounded-[8px] p-[24px]">
 						<h1 className="text-lg font-semibold mb-5">Recent Activity</h1>
 						<div className="flex gap-2 mb-2">
@@ -101,7 +100,6 @@ export default function Card({ type }: CardProps) {
 							</div>
 						</div>
 					</div>
-					{/* Progress: Important Updates Card */}
 					<div className="shadow-xl bg-white rounded-[8px] p-[24px]">
 						<h1 className="text-lg font-semibold mb-2">Important Updates</h1>
 						<p className="text-sm font-light">
@@ -109,14 +107,13 @@ export default function Card({ type }: CardProps) {
 							status changes.
 						</p>
 					</div>
-					{/* Progress: Interview Prep Card */}
 					<div className="shadow-xl bg-[#4F46E5] rounded-[8px] p-[24px]">
-						<h1 className="text-lg font-semibold mb-3 text-2xl text-white">Get Ready for the Interview!</h1>
-						<h2 className="text-sm font-stretch-ultra-expanded text-2xl text-white">
+						<h1 className="text-lg font-semibold mb-3 text-white">Get Ready for the Interview!</h1>
+						<h2 className="text-sm font-stretch-ultra-expanded text-white">
 							While you wait, it's a great time to prepare. Practice your problem-solving skills on
 							platforms like LeetCode and Codeforces.
 						</h2>
-						<p className="text-sm font-bold text-white p-2">Read our interview prep guide →</p>
+						<p className="text-sm font-bold text-white ">Read our interview prep guide →</p>
 					</div>
 				</>
 			)}

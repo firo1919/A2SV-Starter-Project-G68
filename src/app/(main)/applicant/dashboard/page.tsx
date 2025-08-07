@@ -28,7 +28,7 @@ export default function Dashboard() {
 						Your journey to a global tech career starts now.
 					</p>
 					<div className="md:ml-[325px]">
-						<div className="bg-gradient-to-r to-[#7B61FF] from-[#4F46E5] p-8 rounded-xl shadow-lg mb-8">
+						<div className="bg-gradient-to-r to-[#9333EA] from-[#4F46E5] p-8 rounded-xl shadow-lg mb-8">
 							<h2 className="text-2xl font-bold text-white mb-2">G7 November Intake</h2>
 							<p className="text-white mb-4">
 								It’s time to submit your application and show us your potential.
