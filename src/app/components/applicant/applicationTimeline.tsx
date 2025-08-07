@@ -2,7 +2,7 @@ import React from "react";
 
 export default function ApplicationTimeline() {
 	return (
-		<div className="p-3 bg-white shadow-xl rounded-md mx-auto w-full max-w-full md:max-w-[800px] md:ml-[325px] h-[460px]">
+		<div className="p-3 bg-white shadow-xl rounded-md mx-auto w-full max-w-full sm:max-w-lg md:max-w-[800px] h-auto">
 			<h1 className="text-lg font-semibold mb-5">Application Timeline</h1>
 			<div className="flex gap-6 items-start mb-6 flex-col md:flex-row">
 				<img src="/images/app.png" alt="Application Icon" className="w-10 h-10 object-cover rounded-md" />
