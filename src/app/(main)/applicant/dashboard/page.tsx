@@ -3,8 +3,11 @@ import React from "react";
 import Card from "../../../components/applicant/card";
 import Header from "../../../components/Header";
 import { useRouter } from "next/navigation";
+interface DashboardProps {
+	onStartApplication: () => void;
+}
 
-export default function Dashboard() {
+export default function Dashboard({ onStartApplication }: DashboardProps) {
 	const router = useRouter();
 
 	return (
