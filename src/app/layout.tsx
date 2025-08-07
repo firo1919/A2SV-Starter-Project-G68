@@ -1,4 +1,5 @@
 import AuthProvider from "@/providers/AuthProvider";
+import ReduxProvider from "@/providers/ReduxProvider";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
@@ -30,10 +31,12 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<AuthProvider>
-				<body className={`${poppins.variable} ${inter.variable} min-h-screen flex flex-col`}>
-					<main className="grow">{children}</main>
-					<Footer />
-				</body>
+				<ReduxProvider>
+					<body className={`${poppins.variable} ${inter.variable} min-h-screen flex flex-col`}>
+						<main className="grow">{children}</main>
+						<Footer />
+					</body>
+				</ReduxProvider>
 			</AuthProvider>
 		</html>
 	);
