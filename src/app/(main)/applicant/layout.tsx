@@ -1,9 +1,9 @@
 import React from "react";
 
 export default function ApplicantLayout({
-    children,
+	children,
 }: Readonly<{
-    children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-    return <div>{children}</div>;
+	return <div>{children}</div>;
 }
