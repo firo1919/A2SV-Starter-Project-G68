@@ -1,42 +1,33 @@
 "use client";
-import { useState } from "react";
+import { CodingProfilesFormData, EssaysResumeFormData, PersonalInfoFormData } from "@/lib/zod/applicantsSubmitionForm";
+import { ApplicationFormData } from "@/types/ApplicationForm";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Header from "../../../components/Header";
-import PersonalInfo from "../../../components/applicant/PersonalInfo";
 import CodingProfiles from "../../../components/applicant/CodingProfiles";
 import EssaysResume from "../../../components/applicant/EssaysResume";
-import { applicationFormSchema } from "../../../../lib/validation";
+import PersonalInfo from "../../../components/applicant/PersonalInfo";
 
 type FormStep = "personal" | "coding" | "essays";
 
 export default function ApplicationForm() {
 	const router = useRouter();
 	const [currentStep, setCurrentStep] = useState<FormStep>("personal");
-	const [forceValidate, setForceValidate] = useState(false);
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<ApplicationFormData>({
 		// Personal Info
-		idNumber: "",
+		student_id: "",
 		school: "",
 		degreeProgram: "",
 		// Coding Profiles
-		codeforces: "",
-		leetcode: "",
+		codeforces_handle: "",
+		leetcode_handle: "",
 		github: "",
 		// Essays & Resume
-		aboutSelf: "",
-		whyJoin: "",
+		essay_about_you: "",
+		essay_why_a2sv: "",
 		resume: null as File | null,
 	});
-
-	// Function to validate URL format
-	const isValidUrl = (url: string): boolean => {
-		try {
-			new URL(url);
-			return true;
-		} catch {
-			return false;
-		}
-	};
+	const [isValid, setIsValid] = useState({ personal: false, coding: false, essays: false });
 
 	const steps = [
 		{ id: "personal", label: "Personal Info", number: 1 },
@@ -45,80 +36,12 @@ export default function ApplicationForm() {
 	];
 
 	const handleNext = () => {
-		// Validate current step before proceeding
-		let isValid = true;
-
-		if (currentStep === "personal") {
-			// Simple validation - just check if fields are filled
-			const personalData = {
-				idNumber: formData.idNumber,
-				school: formData.school,
-				degreeProgram: formData.degreeProgram,
-			};
-			console.log("Personal data being validated:", personalData);
-
-			// Check if all required fields are filled
-			const isPersonalValid = personalData.idNumber && personalData.school && personalData.degreeProgram;
-			console.log("Personal validation result:", isPersonalValid);
-
-			if (isPersonalValid) {
-				setCurrentStep("coding");
-			} else {
-				isValid = false;
-			}
-		} else if (currentStep === "coding") {
-			// Check if fields are filled and are valid links
-			const codingData = {
-				codeforces: formData.codeforces,
-				leetcode: formData.leetcode,
-				github: formData.github,
-			};
-			console.log("Coding data being validated:", codingData);
-
-			// Check if all required fields are filled and are valid URLs
-			const isCodingValid =
-				codingData.codeforces &&
-				codingData.leetcode &&
-				codingData.github &&
-				isValidUrl(codingData.codeforces) &&
-				isValidUrl(codingData.leetcode) &&
-				isValidUrl(codingData.github);
-			console.log("Coding validation result:", isCodingValid);
-
-			if (isCodingValid) {
-				setCurrentStep("essays");
-			} else {
-				isValid = false;
-			}
-		} else if (currentStep === "essays") {
-			// Check if essays and resume are filled
-			const essaysData = {
-				aboutSelf: formData.aboutSelf,
-				whyJoin: formData.whyJoin,
-				resume: formData.resume,
-			};
-			console.log("Essays data being validated:", essaysData);
-
-			// Check if all required fields are filled
-			const isEssaysValid = essaysData.aboutSelf && essaysData.whyJoin && essaysData.resume;
-			console.log("Essays validation result:", isEssaysValid);
-
-			if (isEssaysValid) {
-				// Form is complete, handle submission
-				handleSubmit();
-			} else {
-				isValid = false;
-			}
-		}
-
-		if (!isValid) {
-			// Trigger validation in the current step component
-			setForceValidate(true);
-			// Reset forceValidate after a longer delay to ensure validation runs
-			setTimeout(() => {
-				setForceValidate(false);
-			}, 500);
-			return;
+		if (currentStep === "personal" && isValid.personal) {
+			setCurrentStep("coding");
+		} else if (currentStep === "coding" && isValid.coding) {
+			setCurrentStep("essays");
+		} else if (currentStep === "essays" && isValid.essays && isValid.coding && isValid.personal) {
+			handleSubmit();
 		}
 	};
 
@@ -128,40 +51,71 @@ export default function ApplicationForm() {
 	};
 
 	const handleSubmit = () => {
-		// Simple validation - check if all required fields are filled
-		const isFormValid =
-			formData.idNumber &&
-			formData.school &&
-			formData.degreeProgram &&
-			formData.codeforces &&
-			formData.leetcode &&
-			formData.github &&
-			isValidUrl(formData.codeforces) &&
-			isValidUrl(formData.leetcode) &&
-			isValidUrl(formData.github) &&
-			formData.aboutSelf &&
-			formData.whyJoin &&
-			formData.resume;
-
-		console.log("Form submission validation:", isFormValid);
-		console.log("Form data:", formData);
-
-		if (isFormValid) {
-			// Handle form submission
-			console.log("Redirecting to success page...");
-			router.push("/applicant/success");
-		} else {
-			// Trigger validation in the current step component
-			setForceValidate(true);
-			// Reset forceValidate after a longer delay to ensure validation runs
-			setTimeout(() => {
-				setForceValidate(false);
-			}, 500);
+		console.log(formData);
+		const submissionFormData = new FormData();
+		for (const key in formData) {
+			// @ts-expect-error: formData may contain File type which is not assignable to string, but FormData.append accepts File
+			submissionFormData.append(key, formData[key]);
 		}
+		console.log(submissionFormData);
 	};
 
-	const updateFormData = (field: string, value: any) => {
-		setFormData((prev) => ({ ...prev, [field]: value }));
+	const handlePersonalInfoSubmit = (data: PersonalInfoFormData | null) => {
+		if (!data) {
+			setIsValid((prev) => ({
+				...prev,
+				personal: false,
+			}));
+		} else {
+			setIsValid((prev) => ({
+				...prev,
+				personal: true,
+			}));
+			setFormData((prev) => ({
+				...prev,
+				student_id: data.student_id,
+				school: data.school,
+				degreeProgram: data.degreeProgram,
+			}));
+		}
+	};
+	const handleCodingProfilesSubmit = (data: CodingProfilesFormData | null) => {
+		if (!data) {
+			setIsValid((prev) => ({
+				...prev,
+				coding: false,
+			}));
+		} else {
+			setIsValid((prev) => ({
+				...prev,
+				coding: true,
+			}));
+			setFormData((prev) => ({
+				...prev,
+				codeforces_handle: data.codeforces_handle,
+				leetcode_handle: data.leetcode_handle,
+				github: data.github,
+			}));
+		}
+	};
+	const handleEssaysAndResumesSubmit = (data: EssaysResumeFormData | null) => {
+		if (!data) {
+			setIsValid((prev) => ({
+				...prev,
+				essays: false,
+			}));
+		} else {
+			setIsValid((prev) => ({
+				...prev,
+				essays: true,
+			}));
+			setFormData((prev) => ({
+				...prev,
+				essay_about_you: data.essay_about_you,
+				essay_why_a2sv: data.essay_why_a2sv,
+				resume: data.resume,
+			}));
+		}
 	};
 
 	const getCurrentStepIndex = () => {
@@ -243,27 +197,9 @@ export default function ApplicationForm() {
 					{/* Form Content */}
 					<div className="px-4 sm:px-8 pb-6 sm:pb-8">
 						<div className="min-h-[100px] sm:min-h-[200px]">
-							{currentStep === "personal" && (
-								<PersonalInfo
-									formData={formData}
-									updateFormData={updateFormData}
-									forceValidate={forceValidate}
-								/>
-							)}
-							{currentStep === "coding" && (
-								<CodingProfiles
-									formData={formData}
-									updateFormData={updateFormData}
-									forceValidate={forceValidate}
-								/>
-							)}
-							{currentStep === "essays" && (
-								<EssaysResume
-									formData={formData}
-									updateFormData={updateFormData}
-									forceValidate={forceValidate}
-								/>
-							)}
+							{currentStep === "personal" && <PersonalInfo updateFormData={handlePersonalInfoSubmit} />}
+							{currentStep === "coding" && <CodingProfiles updateFormData={handleCodingProfilesSubmit} />}
+							{currentStep === "essays" && <EssaysResume updateFormData={handleEssaysAndResumesSubmit} />}
 						</div>
 
 						{/* Navigation Buttons */}
