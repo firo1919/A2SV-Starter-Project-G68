@@ -1,5 +1,6 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { essaysResumeSchema, type EssaysResumeFormData } from "../../../lib/validation";
 
 interface EssaysResumeProps {
 	formData: {
@@ -8,19 +9,86 @@ interface EssaysResumeProps {
 		resume: File | null;
 	};
 	updateFormData: (field: string, value: string | File | null) => void;
+	forceValidate?: boolean;
 }
 
-export default function EssaysResume({ formData, updateFormData }: EssaysResumeProps) {
+export default function EssaysResume({ formData, updateFormData, forceValidate = false }: EssaysResumeProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [errors, setErrors] = useState<Record<string, string>>({});
+	const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+	const validateField = (field: string, value: string | File | null) => {
+		// Simple validation - check if field is empty
+		if (field === "aboutSelf" || field === "whyJoin") {
+			if (!value || (typeof value === "string" && value.trim() === "")) {
+				const fieldName = field === "aboutSelf" ? "About yourself" : "Why you want to join";
+				setErrors((prev) => ({ ...prev, [field]: `${fieldName} is required` }));
+			} else {
+				setErrors((prev) => ({ ...prev, [field]: "" }));
+			}
+		} else if (field === "resume") {
+			if (!value) {
+				setErrors((prev) => ({ ...prev, [field]: "Resume file is required" }));
+			} else {
+				setErrors((prev) => ({ ...prev, [field]: "" }));
+			}
+		}
+	};
+
+	const handleInputChange = (field: string, value: string) => {
+		updateFormData(field, value);
+		if (touched[field]) {
+			validateField(field, value);
+		}
+	};
+
+	const validateAllFields = () => {
+		const newErrors: Record<string, string> = {};
+
+		Object.keys(formData).forEach((field) => {
+			setTouched((prev) => ({ ...prev, [field]: true }));
+
+			// Simple validation - check if field is empty
+			if (field === "aboutSelf" || field === "whyJoin") {
+				const value = formData[field as keyof typeof formData];
+				if (!value || (typeof value === "string" && value.trim() === "")) {
+					const fieldName = field === "aboutSelf" ? "About yourself" : "Why you want to join";
+					newErrors[field] = `${fieldName} is required`;
+				}
+			} else if (field === "resume") {
+				if (!formData.resume) {
+					newErrors[field] = "Resume file is required";
+				}
+			}
+		});
+
+		// Set all errors at once
+		setErrors(newErrors);
+	};
+
+	const handleBlur = (field: string) => {
+		setTouched((prev) => ({ ...prev, [field]: true }));
+		validateField(field, formData[field as keyof typeof formData]);
+	};
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0] || null;
 		updateFormData("resume", file);
+		if (file) {
+			validateField("resume", file);
+		}
 	};
 
 	const handleChooseFile = () => {
 		fileInputRef.current?.click();
 	};
+
+	// Force validation when forceValidate is true
+	useEffect(() => {
+		if (forceValidate) {
+			validateAllFields();
+		}
+	}, [forceValidate]);
 
 	return (
 		<div>
@@ -35,10 +103,14 @@ export default function EssaysResume({ formData, updateFormData }: EssaysResumeP
 					<textarea
 						id="aboutSelf"
 						value={formData.aboutSelf || ""}
-						onChange={(e) => updateFormData("aboutSelf", e.target.value)}
-						className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm"
+						onChange={(e) => handleInputChange("aboutSelf", e.target.value)}
+						onBlur={() => handleBlur("aboutSelf")}
+						className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm ${
+							errors.aboutSelf ? "border-red-500" : "border-gray-200"
+						}`}
 						rows={4}
 					/>
+					{errors.aboutSelf && <p className="text-red-500 text-xs mt-1">{errors.aboutSelf}</p>}
 				</div>
 
 				<div>
@@ -48,10 +120,14 @@ export default function EssaysResume({ formData, updateFormData }: EssaysResumeP
 					<textarea
 						id="whyJoin"
 						value={formData.whyJoin}
-						onChange={(e) => updateFormData("whyJoin", e.target.value)}
-						className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm"
+						onChange={(e) => handleInputChange("whyJoin", e.target.value)}
+						onBlur={() => handleBlur("whyJoin")}
+						className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm ${
+							errors.whyJoin ? "border-red-500" : "border-gray-200"
+						}`}
 						rows={4}
 					/>
+					{errors.whyJoin && <p className="text-red-500 text-xs mt-1">{errors.whyJoin}</p>}
 				</div>
 
 				<div>
@@ -78,6 +154,7 @@ export default function EssaysResume({ formData, updateFormData }: EssaysResumeP
 					) : (
 						<p className="text-sm text-red-500 mt-2">*no file chosen*</p>
 					)}
+					{errors.resume && <p className="text-red-500 text-xs mt-1">{errors.resume}</p>}
 				</div>
 			</div>
 		</div>
