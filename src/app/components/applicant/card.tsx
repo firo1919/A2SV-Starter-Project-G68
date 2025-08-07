@@ -15,7 +15,6 @@ export default function Card({ type }: CardProps) {
 			<div className={cardStyle}>
 				{type === "dashboard" ? (
 					<>
-						{" "}
 						<div className="shadow-xl bg-white rounded-[8px] p-[24px] w-full">
 							<h1 className="text-xl font-bold mb-5 text-center">Complete Your Profile</h1>
 							<div className="flex flex-col items-center">
@@ -77,28 +76,28 @@ export default function Card({ type }: CardProps) {
 				) : (
 					<>
 						<div className="shadow-xl bg-white rounded-[8px] p-[24px] w-full">
-							<h1 className="text-lg font-semibold mb-5 text-center">Recent Activity</h1>
-							<div className="grid gap-2 items-center">
-								<div className="grid grid-cols-[auto,1fr] gap-2 mb-2 justify-center items-center">
-									<img
-										src="/images/image.png"
-										alt="Application Submitted"
-										className="w-10 h-10 object-cover rounded-md"
-									/>
+							<h1 className="text-lg font-semibold mb-5 text-left">Recent Activity</h1>
+							<div className="flex flex-col gap-4">
+								<div className="flex items-center gap-3">
+									<div className="rounded-full p-2 flex items-center justify-center">
+										<img
+											src="/images/image.png"
+											alt="Application Submitted"
+											className="w-10 h-10"
+										/>
+									</div>
 									<div>
-										<h2 className="text-sm font-bold">Application Submitted</h2>
-										<p className="text-xs text-gray-400">October 26, 2023</p>
+										<p className="text-base font-semibold text-gray-700">Application Submitted</p>
+										<p className="text-sm text-gray-400">October 26, 2023</p>
 									</div>
 								</div>
-								<div className="grid grid-cols-[auto,1fr] gap-2 mb-2 justify-center items-center">
-									<img
-										src="/images/img2.png"
-										alt="Interview Scheduled"
-										className="w-10 h-10 object-cover rounded-md"
-									/>
+								<div className="flex items-center gap-3">
+									<div className=" rounded-full p-2 flex ">
+										<img src="/images/img2.png" alt="Interview Scheduled" className="w-10 h-10" />
+									</div>
 									<div>
-										<h2 className="text-sm font-bold">Interview Scheduled</h2>
-										<p className="text-xs text-gray-400">November 5, 2023</p>
+										<p className="text-base font-semibold text-gray-700">Interview Scheduled</p>
+										<p className="text-sm text-gray-400">November 5, 2023</p>
 									</div>
 								</div>
 							</div>

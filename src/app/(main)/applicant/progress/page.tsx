@@ -20,7 +20,6 @@ export default function Progress() {
 					</div>
 					<div className="md:hidden flex items-center">
 						<BurgerMenu>
-							{/* Add header items inside BurgerMenu for mobile */}
 							<div className="flex flex-col gap-4 mt-4">
 								<p className="text-sm font-semibold text-[#4F46E5]">Your Profile</p>
 								<p className="text-sm font-semibold text-gray-600">Applicant Name</p>
