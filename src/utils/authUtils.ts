@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { UserLogin } from "@/lib/zod/UserLogin";
 import LoginResponse from "@/types/LoginResponse";
 import RefreshTokenResponse from "@/types/RefreshTokenResponse";
@@ -23,20 +22,15 @@ export async function loginUser(data: UserLogin): Promise<LoginResponse | null> 
 	return null;
 }
 
-export async function refreshToken(): Promise<RefreshTokenResponse | null> {
+export async function refreshToken(token: string): Promise<RefreshTokenResponse | null> {
 	const url = `${baseUrl}/auth/token/refresh`;
-	const session = await auth();
 	console.log("Attempting to refresh token", url);
 	try {
 		const response = await fetch(url, {
 			method: "POST",
 			body: "",
-			headers: { Authorization: `Bearer ${session?.user.accessToken}` },
+			headers: { Authorization: `Bearer ${token}` },
 		});
-		if (!response.ok) {
-			console.log("Failed refreshing token");
-			return null;
-		}
 
 		const responseData: RefreshTokenResponse = await response.json();
 		return responseData;
