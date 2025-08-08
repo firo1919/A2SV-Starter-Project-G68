@@ -22,6 +22,8 @@ export async function POST(req: Request): Promise<NextResponse<RouteHandlerRespo
 	const codeforces_handle = formData.get("codeforces_handle") as string | null;
 	const essay_why_a2sv = formData.get("essay_why_a2sv") as string | null;
 	const essay_about_you = formData.get("essay_about_you") as string | null;
+	const country = formData.get("country") as string | null;
+	const degree = formData.get("degree") as string | null;
 
 	if (
 		!resume ||
@@ -30,6 +32,8 @@ export async function POST(req: Request): Promise<NextResponse<RouteHandlerRespo
 		!leetcode_handle ||
 		!codeforces_handle ||
 		!essay_why_a2sv ||
+		!country ||
+		!degree ||
 		!essay_about_you
 	) {
 		return NextResponse.json({ success: false, message: "Missing required fields", data: null });
@@ -45,6 +49,8 @@ export async function POST(req: Request): Promise<NextResponse<RouteHandlerRespo
 	apiFormData.set("codeforces_handle", codeforces_handle);
 	apiFormData.set("essay_why_a2sv", essay_why_a2sv);
 	apiFormData.set("essay_about_you", essay_about_you);
+	apiFormData.set("country", country);
+	apiFormData.set("degree", degree);
 
 	const API_BASE = process.env.API_BASE;
 	if (!API_BASE) {

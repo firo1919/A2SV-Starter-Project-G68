@@ -12,7 +12,31 @@ export const applicationsAPi = createApi({
 				body: data,
 			}),
 		}),
+		updateApplication: builder.mutation<RouteHandlerResponse, { application: FormData; id: string }>({
+			query: (data) => ({
+				url: data.id,
+				method: "PUT",
+				body: data.application,
+			}),
+		}),
+		deleteApplication: builder.mutation<RouteHandlerResponse, { id: string }>({
+			query: (data) => ({
+				url: data.id,
+				method: "DELETE",
+			}),
+		}),
+		submitApplication: builder.mutation<RouteHandlerResponse, { id: string }>({
+			query: (data) => ({
+				url: data.id,
+				method: "PATCH",
+			}),
+		}),
 	}),
 });
 
-export const { useCreateApplicationMutation } = applicationsAPi;
+export const {
+	useCreateApplicationMutation,
+	useDeleteApplicationMutation,
+	useSubmitApplicationMutation,
+	useUpdateApplicationMutation,
+} = applicationsAPi;
