@@ -2,7 +2,6 @@ import ApplicationCard from "./application-card"
 import { Application } from "./types"
 
 export default function ApplicationGrid() {
-  // Dummy data for demonstration
   const applications: Application[] = [
     {
       id: "1",

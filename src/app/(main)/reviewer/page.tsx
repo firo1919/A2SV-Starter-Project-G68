@@ -8,7 +8,6 @@ function page() {
     <main className="bg-gray-50 min-h-screen">
       <AssignedApplications />
       <ApplicationGrid />
-      {/* Add the Pagination component here with dummy props for now */}
       <Pagination currentPage={1} itemsPerPage={6} totalItems={42} />
     </main>
   )

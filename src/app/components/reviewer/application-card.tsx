@@ -1,4 +1,7 @@
+'use client' // <--- THIS IS CRUCIAL FOR LINK TO WORK
+
 import Image from "next/image"
+import Link from "next/link" // Import Link
 import { CustomButton } from "./custom-button"
 import { Application, ApplicationStatus } from "./types"
 import { cn } from "./utils"
@@ -24,49 +27,50 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
   const getButtonProps = (status: ApplicationStatus) => {
     switch (status) {
       case "under-review":
-        return { text: "Continue Review", style: { backgroundColor: "#4F46E5", color: "white" } };
+        return { text: "Continue Review", variant: "purple" };
       case "review-complete":
-        return { text: "View Details", variant: "outline" as const };
+        return { text: "View Details", variant: "outline" };
       case "new":
-        return { text: "Start Review", style: { backgroundColor: "#4F46E5", color: "white" } };
+        return { text: "Start Review", variant: "purple" };
       default:
-        return { text: "View Details", variant: "outline" as const };
+        return { text: "View Details", variant: "outline" };
     }
   };
 
   const buttonProps = getButtonProps(application.status);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
-      <div className="flex items-center gap-4 mb-4">
-        <Image
-          src={application.avatarUrl || "/placeholder.svg"}
-          alt={`${application.name}'s avatar`}
-          width={48}
-          height={48}
-          className="rounded-full"
-        />
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">{application.name}</h3>
-          <p className="text-sm text-gray-600">Submitted: {application.submittedDate}</p>
+    // Ensure the entire card is wrapped in a Link component
+    <Link href={`/reviews/${application.id}`} className="block">
+      <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+        <div className="flex items-center gap-4 mb-4">
+          <Image
+            src={application.avatarUrl || "/placeholder.svg?height=48&width=48&text=Avatar"}
+            alt={`${application.name}'s avatar`}
+            width={48}
+            height={48}
+            className="rounded-full"
+          />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">{application.name}</h3>
+            <p className="text-sm text-gray-600">Submitted: {application.submittedDate}</p>
+          </div>
         </div>
+        <div className="mb-6">
+          <span
+            className={cn(
+              "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
+              getStatusClasses(application.status)
+            )}
+          >
+            {application.status.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}
+          </span>
+        </div>
+        {/* The button inside the link will also navigate, consider if you want a separate action */}
+        <CustomButton variant={buttonProps.variant} className="w-full mt-auto">
+          {buttonProps.text}
+        </CustomButton>
       </div>
-      <div className="mb-6">
-        <span
-          className={cn(
-            "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
-            getStatusClasses(application.status)
-          )}
-        >
-          {application.status.replace(/-/g, " ").replace(/\b\w/g, char => char.toUpperCase())}
-        </span>
-      </div>
-      <CustomButton
-        {...(buttonProps.style ? { style: buttonProps.style } : { variant: buttonProps.variant })}
-        className="w-full mt-auto"
-      >
-        {buttonProps.text}
-      </CustomButton>
-    </div>
+    </Link>
   );
 }

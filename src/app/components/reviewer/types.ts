@@ -6,4 +6,6 @@ export interface Application {
   submittedDate: string;
   status: ApplicationStatus;
   avatarUrl: string;
+  reviewerComments?: string;
+  score?: number;
 }
