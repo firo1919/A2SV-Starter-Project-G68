@@ -6,9 +6,10 @@ interface Props {
 	register: UseFormRegister<EssaysResumeFormData>;
 	errors: FieldErrors<EssaysResumeFormData>;
 	resume: File | null;
+	setResume: (file: File | null) => void; // add this
 }
 
-export default function EssaysResume({ register, errors, resume }: Props) {
+export default function EssaysResume({ register, errors, resume, setResume }: Props) {
 	return (
 		<div>
 			<h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Essays & Resume</h2>
@@ -50,18 +51,23 @@ export default function EssaysResume({ register, errors, resume }: Props) {
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
 						<span className="text-sm text-gray-500">Upload your resume</span>
 						<label
-							htmlFor="submitform"
+							htmlFor="resume-input"
 							className="px-2 py-1.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-xs"
 						>
 							Choose File
 						</label>
 					</div>
 					<input
-						id="submitform"
+						id="resume-input"
 						className="hidden"
 						type="file"
 						accept=".pdf,.doc,.docx"
-						{...register("resume")}
+						{...register("resume", {
+							onChange: (e) => {
+								const file = (e.target as HTMLInputElement).files?.[0] ?? null;
+								setResume(file);
+							},
+						})}
 					/>
 					{resume ? (
 						<p className="text-sm text-green-600 mt-2">✓ {resume.name}</p>

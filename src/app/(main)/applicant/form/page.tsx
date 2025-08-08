@@ -199,7 +199,12 @@ export default function ApplicationForm() {
 							{currentStep === "personal" && <PersonalInfo errors={errorsA} register={registerA} />}
 							{currentStep === "coding" && <CodingProfiles errors={errorsB} register={registerB} />}
 							{currentStep === "essays" && (
-								<EssaysResume resume={formData.resume} errors={errorsC} register={registerC} />
+								<EssaysResume
+									resume={formData.resume}
+									errors={errorsC}
+									register={registerC}
+									setResume={(file) => setFormData((prev) => ({ ...prev, resume: file }))}
+								/>
 							)}
 						</div>
 
