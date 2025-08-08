@@ -16,21 +16,23 @@ import Header from "../../../components/Header";
 import CodingProfiles from "../../../components/applicant/CodingProfiles";
 import EssaysResume from "../../../components/applicant/EssaysResume";
 import PersonalInfo from "../../../components/applicant/PersonalInfo";
+import { useCreateApplicationMutation } from "@/lib/redux/api/applicationsApiSlice";
 
 type FormStep = "personal" | "coding" | "essays";
 
 export default function ApplicationForm() {
 	const router = useRouter();
 	const [currentStep, setCurrentStep] = useState<FormStep>("personal");
+	const [createApplication] = useCreateApplicationMutation();
 	const [formData, setFormData] = useState<ApplicationFormData>({
 		// Personal Info
 		student_id: "",
 		school: "",
-		degreeProgram: "",
+		degree: "",
+		country: "",
 		// Coding Profiles
 		codeforces_handle: "",
 		leetcode_handle: "",
-		github: "",
 		// Essays & Resume
 		essay_about_you: "",
 		essay_why_a2sv: "",
@@ -112,7 +114,6 @@ export default function ApplicationForm() {
 				...prev,
 				codeforces_handle: data.codeforces_handle,
 				leetcode_handle: data.leetcode_handle,
-				github: data.github,
 			}));
 		}
 	}
