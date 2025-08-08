@@ -50,7 +50,7 @@ export default function Dashboard({ onStartApplication }: DashboardProps) {
 									</p>
 									<button
 										className="bg-white text-[#4F46E5] font-semibold px-6 py-2 rounded-md shadow"
-										onClick={() => router.push("/applicant/form")}
+										onClick={() => router.push("/applicant/create_application")}
 									>
 										Start Application
 									</button>
