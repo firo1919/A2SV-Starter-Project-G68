@@ -2,7 +2,7 @@ import RegisterUserForm from "@/app/components/RegisterUserForm";
 
 async function RegistrationPage() {
 	return (
-		<div className="my-10 mx-3 flex items-center justify-center">
+		<div className="flex items-center justify-center min-h-[calc(80vh)] m-6">
 			<RegisterUserForm />
 		</div>
 	);

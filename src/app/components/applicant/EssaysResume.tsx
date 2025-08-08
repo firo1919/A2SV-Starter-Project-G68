@@ -1,26 +1,23 @@
 "use client";
-import { useRef } from "react";
+import { EssaysResumeFormData } from "@/lib/zod/applicantsSubmitionForm";
+import { useState } from "react";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
-interface EssaysResumeProps {
-	formData: {
-		aboutSelf: string;
-		whyJoin: string;
-		resume: File | null;
-	};
-	updateFormData: (field: string, value: string | File | null) => void;
+interface Props {
+	register: UseFormRegister<EssaysResumeFormData>;
+	errors: FieldErrors<EssaysResumeFormData>;
 }
 
-export default function EssaysResume({ formData, updateFormData }: EssaysResumeProps) {
-	const fileInputRef = useRef<HTMLInputElement>(null);
+export default function EssaysResume({ register, errors }: Props) {
+	const [resume, setResume] = useState("");
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0] || null;
-		updateFormData("resume", file);
-	};
-
-	const handleChooseFile = () => {
-		fileInputRef.current?.click();
-	};
+	// Function to handle file input change
+	// This is used to update the resume state when a file is selected
+	function onChangeResume(e: React.ChangeEvent<HTMLInputElement>) {
+		const file = e.target.files ? e.target.files[0] : null;
+		const fileName = file ? file.name : "No file chosen";
+		setResume(fileName);
+	}
 
 	return (
 		<div>
@@ -34,11 +31,13 @@ export default function EssaysResume({ formData, updateFormData }: EssaysResumeP
 					</label>
 					<textarea
 						id="aboutSelf"
-						value={formData.aboutSelf || ""}
-						onChange={(e) => updateFormData("aboutSelf", e.target.value)}
-						className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm"
+						{...register("essay_about_you")}
+						className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm ${
+							errors.essay_about_you?.message ? "border-red-500" : "border-gray-200"
+						}`}
 						rows={4}
 					/>
+					{errors.essay_about_you && <p className="text-red-600 text-sm">{errors.essay_about_you.message}</p>}
 				</div>
 
 				<div>
@@ -47,36 +46,42 @@ export default function EssaysResume({ formData, updateFormData }: EssaysResumeP
 					</label>
 					<textarea
 						id="whyJoin"
-						value={formData.whyJoin}
-						onChange={(e) => updateFormData("whyJoin", e.target.value)}
-						className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm"
+						{...register("essay_why_a2sv")}
+						className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none text-sm ${
+							errors.essay_why_a2sv?.message ? "border-red-500" : "border-gray-200"
+						}`}
 						rows={4}
 					/>
+					{errors.essay_why_a2sv && <p className="text-red-600 text-sm">{errors.essay_why_a2sv.message}</p>}
 				</div>
 
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-2">Resume</label>
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
 						<span className="text-sm text-gray-500">Upload your resume</span>
-						<button
-							type="button"
-							onClick={handleChooseFile}
+						<label
+							htmlFor="resume-input"
 							className="px-2 py-1.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-xs"
 						>
 							Choose File
-						</button>
+						</label>
 					</div>
 					<input
-						ref={fileInputRef}
+						id="resume-input"
+						className="hidden"
 						type="file"
 						accept=".pdf,.doc,.docx"
-						onChange={handleFileChange}
-						className="hidden"
+						{...register("resume", {
+							onChange: (e) => onChangeResume(e),
+						})}
 					/>
-					{formData.resume ? (
-						<p className="text-sm text-green-600 mt-2">✓ {formData.resume.name}</p>
+					{resume ? (
+						<p className="text-sm text-green-600 mt-2">✓ {resume}</p>
 					) : (
 						<p className="text-sm text-red-500 mt-2">*no file chosen*</p>
+					)}
+					{typeof errors.resume?.message === "string" && (
+						<p className="text-red-600 text-sm">{errors.resume.message}</p>
 					)}
 				</div>
 			</div>

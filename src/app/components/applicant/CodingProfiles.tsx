@@ -1,13 +1,11 @@
-interface CodingProfilesProps {
-	formData: {
-		codeforces: string;
-		leetcode: string;
-		github: string;
-	};
-	updateFormData: (field: string, value: string) => void;
+import { CodingProfilesFormData } from "@/lib/zod/applicantsSubmitionForm";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
+interface Props {
+	register: UseFormRegister<CodingProfilesFormData>;
+	errors: FieldErrors<CodingProfilesFormData>;
 }
 
-export default function CodingProfiles({ formData, updateFormData }: CodingProfilesProps) {
+export default function CodingProfiles({ register, errors }: Props) {
 	return (
 		<div>
 			<h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Coding Profiles</h2>
@@ -20,10 +18,14 @@ export default function CodingProfiles({ formData, updateFormData }: CodingProfi
 						<input
 							type="text"
 							id="codeforces"
-							value={formData.codeforces}
-							onChange={(e) => updateFormData("codeforces", e.target.value)}
-							className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm"
+							{...register("codeforces_handle")}
+							className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm ${
+								errors.codeforces_handle?.message ? "border-red-500" : "border-gray-200"
+							}`}
 						/>
+						{errors.codeforces_handle && (
+							<p className="text-red-600 text-sm">{errors.codeforces_handle.message}</p>
+						)}
 					</div>
 					<div>
 						<label htmlFor="leetcode" className="block text-sm font-medium text-gray-700 mb-2">
@@ -32,10 +34,14 @@ export default function CodingProfiles({ formData, updateFormData }: CodingProfi
 						<input
 							type="text"
 							id="leetcode"
-							value={formData.leetcode}
-							onChange={(e) => updateFormData("leetcode", e.target.value)}
-							className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm"
+							{...register("leetcode_handle")}
+							className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm ${
+								errors.leetcode_handle?.message ? "border-red-500" : "border-gray-200"
+							}`}
 						/>
+						{errors.leetcode_handle && (
+							<p className="text-red-600 text-sm">{errors.leetcode_handle.message}</p>
+						)}
 					</div>
 				</div>
 				<div>
@@ -45,10 +51,12 @@ export default function CodingProfiles({ formData, updateFormData }: CodingProfi
 					<input
 						type="text"
 						id="github"
-						value={formData.github}
-						onChange={(e) => updateFormData("github", e.target.value)}
-						className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm"
+						{...register("github")}
+						className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm ${
+							errors.github?.message ? "border-red-500" : "border-gray-200"
+						}`}
 					/>
+					{errors.github && <p className="text-red-600 text-sm">{errors.github.message}</p>}
 				</div>
 			</div>
 		</div>

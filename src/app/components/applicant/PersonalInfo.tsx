@@ -1,15 +1,13 @@
-interface PersonalInfoProps {
-	formData: {
-		idNumber: string;
-		school: string;
-		degreeProgram: string;
-	};
-	updateFormData: (field: string, value: string) => void;
-}
+import { PersonalInfoFormData } from "@/lib/zod/applicantsSubmitionForm";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
-export default function PersonalInfo({ formData, updateFormData }: PersonalInfoProps) {
+interface Props {
+	register: UseFormRegister<PersonalInfoFormData>;
+	errors: FieldErrors<PersonalInfoFormData>;
+}
+export default function PersonalInfo({ register, errors }: Props) {
 	return (
-		<div>
+		<form>
 			<h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Personal Information</h2>
 			<div className="space-y-4 sm:space-y-6">
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -20,10 +18,12 @@ export default function PersonalInfo({ formData, updateFormData }: PersonalInfoP
 						<input
 							type="text"
 							id="idNumber"
-							value={formData.idNumber}
-							onChange={(e) => updateFormData("idNumber", e.target.value)}
-							className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm"
+							{...register("student_id")}
+							className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm ${
+								errors.student_id?.message ? "border-red-500" : "border-gray-200"
+							}`}
 						/>
+						{errors.student_id && <p className="text-red-600 text-sm">{errors.student_id.message}</p>}
 					</div>
 					<div>
 						<label htmlFor="school" className="block text-sm font-medium text-gray-700 mb-2">
@@ -32,10 +32,12 @@ export default function PersonalInfo({ formData, updateFormData }: PersonalInfoP
 						<input
 							type="text"
 							id="school"
-							value={formData.school}
-							onChange={(e) => updateFormData("school", e.target.value)}
-							className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm"
+							{...register("school")}
+							className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm ${
+								errors.school?.message ? "border-red-500" : "border-gray-200"
+							}`}
 						/>
+						{errors.school && <p className="text-red-600 text-sm">{errors.school.message}</p>}
 					</div>
 				</div>
 				<div>
@@ -45,12 +47,14 @@ export default function PersonalInfo({ formData, updateFormData }: PersonalInfoP
 					<input
 						type="text"
 						id="degreeProgram"
-						value={formData.degreeProgram}
-						onChange={(e) => updateFormData("degreeProgram", e.target.value)}
-						className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm"
+						{...register("degreeProgram")}
+						className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm ${
+							errors.degreeProgram?.message ? "border-red-500" : "border-gray-200"
+						}`}
 					/>
+					{errors.degreeProgram && <p className="text-red-600 text-sm">{errors.degreeProgram.message}</p>}
 				</div>
 			</div>
-		</div>
+		</form>
 	);
 }

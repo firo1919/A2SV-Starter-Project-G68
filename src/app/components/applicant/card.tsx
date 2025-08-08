@@ -88,6 +88,7 @@ export default function Card({ type }: CardProps) {
 									</div>
 									<div>
 										<p className="text-base font-semibold text-gray-700">Application Submitted</p>
+
 										<p className="text-sm text-gray-400">October 26, 2023</p>
 									</div>
 								</div>
