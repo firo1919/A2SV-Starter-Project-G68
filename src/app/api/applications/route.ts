@@ -1,11 +1,16 @@
 import { auth } from "@/auth";
+import { RouteHandlerResponse } from "@/types/RouteHandler";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<NextResponse<RouteHandlerResponse>> {
 	const session = await auth();
 
 	if (!session?.user?.accessToken) {
-		return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
+		return NextResponse.json({
+			success: false,
+			message: "Not authenticated",
+			data: null,
+		});
 	}
 
 	const formData = await req.formData();
@@ -17,6 +22,8 @@ export async function POST(req: Request) {
 	const codeforces_handle = formData.get("codeforces_handle") as string | null;
 	const essay_why_a2sv = formData.get("essay_why_a2sv") as string | null;
 	const essay_about_you = formData.get("essay_about_you") as string | null;
+	const country = formData.get("country") as string | null;
+	const degree = formData.get("degree") as string | null;
 
 	if (
 		!resume ||
@@ -25,9 +32,11 @@ export async function POST(req: Request) {
 		!leetcode_handle ||
 		!codeforces_handle ||
 		!essay_why_a2sv ||
+		!country ||
+		!degree ||
 		!essay_about_you
 	) {
-		return NextResponse.json({ detail: "Missing required fields" }, { status: 400 });
+		return NextResponse.json({ success: false, message: "Missing required fields", data: null });
 	}
 
 	const resumeBlob = new Blob([await resume.arrayBuffer()], { type: resume.type });
@@ -40,11 +49,13 @@ export async function POST(req: Request) {
 	apiFormData.set("codeforces_handle", codeforces_handle);
 	apiFormData.set("essay_why_a2sv", essay_why_a2sv);
 	apiFormData.set("essay_about_you", essay_about_you);
+	apiFormData.set("country", country);
+	apiFormData.set("degree", degree);
 
 	const API_BASE = process.env.API_BASE;
 	if (!API_BASE) {
 		console.error("API_BASE is not set in the environment");
-		return NextResponse.json({ success: false });
+		return NextResponse.json({ success: false, message: "API_BASE is not set in the environment", data: null });
 	}
 
 	try {
@@ -59,12 +70,12 @@ export async function POST(req: Request) {
 		const data = await response.json();
 
 		if (!response.ok) {
-			return NextResponse.json({ success: false, data });
+			return NextResponse.json({ success: false, message: "Failed to submit application", data });
 		}
 
-		return NextResponse.json({ success: true, data });
+		return NextResponse.json({ success: true, message: "Application submitted successfully", data });
 	} catch (error) {
 		console.error("Application submission error:", error);
-		return NextResponse.json({ success: false });
+		return NextResponse.json({ success: false, message: "Application submission error", data: null });
 	}
 }

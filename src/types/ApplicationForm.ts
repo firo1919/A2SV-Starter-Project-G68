@@ -1,11 +1,11 @@
-export interface ApplicationFormData {
-	student_id: string;
+export interface ApplicationForm {
+	resume: File;
 	school: string;
-	degreeProgram: string;
-	codeforces_handle: string;
+	student_id: string;
 	leetcode_handle: string;
-	github: string;
-	essay_about_you: string;
+	codeforces_handle: string;
 	essay_why_a2sv: string;
-	resume: File | null;
+	essay_about_you: string;
+	country: string;
+	degree: string;
 }
