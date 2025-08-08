@@ -1,5 +1,5 @@
-export interface ApplicationForm {
-	resume: File;
+export interface ApplicationFormData {
+	resume: File | null;
 	school: string;
 	student_id: string;
 	leetcode_handle: string;

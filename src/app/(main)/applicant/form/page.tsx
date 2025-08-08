@@ -16,21 +16,23 @@ import Header from "../../../components/Header";
 import CodingProfiles from "../../../components/applicant/CodingProfiles";
 import EssaysResume from "../../../components/applicant/EssaysResume";
 import PersonalInfo from "../../../components/applicant/PersonalInfo";
+import { useCreateApplicationMutation } from "@/lib/redux/api/applicationsApiSlice";
 
 type FormStep = "personal" | "coding" | "essays";
 
 export default function ApplicationForm() {
 	const router = useRouter();
 	const [currentStep, setCurrentStep] = useState<FormStep>("personal");
+	const [createApplication, { isLoading, error, isSuccess }] = useCreateApplicationMutation();
 	const [formData, setFormData] = useState<ApplicationFormData>({
 		// Personal Info
 		student_id: "",
 		school: "",
-		degreeProgram: "",
+		degree: "",
+		country: "",
 		// Coding Profiles
 		codeforces_handle: "",
 		leetcode_handle: "",
-		github: "",
 		// Essays & Resume
 		essay_about_you: "",
 		essay_why_a2sv: "",
@@ -81,7 +83,7 @@ export default function ApplicationForm() {
 		else if (currentStep === "essays") setCurrentStep("coding");
 	};
 
-	const handleFormSubmit = (data: EssaysResumeFormData) => {
+	const handleFormSubmit = async (data: EssaysResumeFormData) => {
 		console.log(data);
 		setFormData((prev) => ({
 			...prev,
@@ -95,6 +97,16 @@ export default function ApplicationForm() {
 			submissionFormData.append(key, formData[key]);
 		}
 		console.log(submissionFormData);
+		try {
+			const response = await createApplication(submissionFormData);
+			console.log(response);
+			if (!response.data?.success) {
+				console.log(response.data?.message);
+				return;
+			}
+		} catch (error) {
+			console.log(error);
+		}
 		router.push("/applicant/success");
 	};
 
@@ -106,13 +118,13 @@ export default function ApplicationForm() {
 				student_id: data.student_id,
 				school: data.school,
 				degreeProgram: data.degreeProgram,
+				country: data.country,
 			}));
 		} else {
 			setFormData((prev) => ({
 				...prev,
 				codeforces_handle: data.codeforces_handle,
 				leetcode_handle: data.leetcode_handle,
-				github: data.github,
 			}));
 		}
 	}
