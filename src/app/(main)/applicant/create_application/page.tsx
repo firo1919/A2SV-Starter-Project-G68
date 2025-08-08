@@ -217,8 +217,9 @@ export default function ApplicationForm() {
 							</button>
 							{currentStep === "essays" ? (
 								<button
-									onClick={handleNext}
+									// onClick={handleNext}
 									className="px-4 sm:px-6 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+									onClick={() => router.push("/applicant/progress")}
 								>
 									Submit
 								</button>
