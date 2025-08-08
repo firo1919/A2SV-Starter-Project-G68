@@ -1,45 +1,84 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { DevTool } from "@hookform/devtools"
+import { useUpdateUserMutation } from '@/lib/redux/api/adminApiSlice'
+import { EditUser, userSchema } from '@/lib/zod/admin/UpdateUser'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'react-toastify'
+import { useSearchParams } from 'next/navigation'
+import { boolean } from 'zod'
 
-type FormTypes = {
-    full_name: string,
-    email_address: string,
-    password: string,
-    role: string
-}
 
 const EditNewUserForm = () => {
-    const form = useForm<FormTypes>({
-        defaultValues: {
-            full_name: "",
-            email_address: "",
-            password: "",
-            role: "Applicant"
-        }
-    });
-  const { register, control, handleSubmit, formState } = form;
-  const { errors, isSubmitting, isSubmitted, isSubmitSuccessful } = formState;
+    const [updateUser, {isLoading, error}] = useUpdateUserMutation()
+    const form = useForm<EditUser>({ resolver: zodResolver(userSchema) });
+    const { register, control, handleSubmit, formState, reset } = form;
+    const { errors, isSubmitting, isSubmitted, isSubmitSuccessful } = formState;
+    const searchParams = useSearchParams();
+    const userId = searchParams.get('id');
 
-  function submitFunc () {
-    // write submit function here
-  }
+
+    if (errors) {
+        console.log("errrooooror", errors)
+    }
+    async function submitFunc(data: EditUser) {
+        console.log("Form submitted with data:", data);
+
+        if (!userId) {
+            toast.error("User ID is missing. Cannot update user.");
+            return;
+        }
+
+        let status: boolean;
+        if (data.is_active === "true") {
+            status = true;
+        } else {
+            status = false
+        }
+
+
+        try {
+
+            const updatedUser = {
+                ...data,
+                is_active: status
+            }
+
+            const result = await updateUser({ user: updatedUser, id: userId }).unwrap();
+
+            toast.success("User updated successfully!", {
+            draggable: false,
+            theme: "colored",
+            hideProgressBar: true,
+            });
+
+            reset();
+        } catch (error) {
+            toast.error("User update failed", {
+            draggable: false,
+            theme: "colored",
+            hideProgressBar: true,
+            });
+            console.error(error);
+        }
+        }
+
 
 
   return (
-    <div>
-        <form className='flex flex-col p-4 bg-white w-fit' onSubmit={handleSubmit(submitFunc)} noValidate>
-            <div className='grid grid-cols-1 lg:grid-cols-2 w-full lg:w-[1216px] bg-white gap-2'>
+    <div className='w-full flex flex-col items-center mb-16 md:mb-30'>
+        <form className='flex flex-col p-4 w-full' onSubmit={handleSubmit(submitFunc)} noValidate>
+            <div className='grid grid-cols-1 md:grid-cols-2 w-full bg-white gap-2 p-6  rounded-t-2xl'>
                 <div className='flex flex-col gap-1'>
                     <label className='bg-white font-medium' htmlFor="full_name">Full name</label>
                     <input className='bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] w-full rounded-2xl py-1' type="text" id='full_name' {...register("full_name", {required: "please enter cycle name"})}/>
                     <p className= 'text-red-600'>{errors.full_name?.message}</p>
                 </div>
                 <div className='flex flex-col gap-1'>
-                    <label className='bg-white font-medium' htmlFor="email_address">Email address</label>
-                    <input className='bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] w-full rounded-2xl py-1' type="email" id='email_address' {...register("email_address", {required: "please enter your email_address"})}/>
-                    <p className= 'text-red-600'>{errors.email_address?.message}</p>
+                    <label className='bg-white font-medium' htmlFor="email">Email address</label>
+                    <input className='bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] w-full rounded-2xl py-1' type="email" id='email' {...register("email", {required: "please enter your email"})}/>
+                    <p className= 'text-red-600'>{errors.email?.message}</p>
                 </div>
                 <div className='flex flex-col gap-1'>
                     <label className='bg-white font-medium' htmlFor="password">Password</label>
@@ -56,11 +95,19 @@ const EditNewUserForm = () => {
                     </select>
                     <p className= 'text-red-600'>{errors.role?.message}</p>
                 </div>
+                                <div className='flex flex-col gap-1'>
+                    <label className='bg-white font-medium' htmlFor="is_active">Status</label>
+                    <select className='bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] w-full border-[#D1D5DB] border-1 rounded py-1' id='is_active' {...register("is_active", {required: "please enter activation status"})}>
+                        <option value="true">Activate</option>
+                        <option value="false">Deactivate</option>
+                    </select>
+                    <p className= 'text-red-600'>{errors.is_active?.message}</p>
+                </div>
             </div>
         
-            <div className='bg-[#F9FAFB] flex justify-end p-2 gap-6'>
+            <div className='bg-[#F9FAFB] flex justify-end p-4 gap-6 w-full rounded-b-2xl  shadow-[0_4px_6px_-1px_rgba(0,0,0,0.09)]'>
                 <button className='bg-white text-[#111111] border-[#D1D5DB] border-1 rounded py-2 px-4'>Cancel</button>
-                <button className='text-white bg-[#4F46E5] rounded py-2 px-4'>Update User</button>
+                <button type='submit' className='text-white bg-[#4F46E5] rounded py-2 px-4'>Update User</button>
             </div>
         </form>
         <DevTool control={control}/>

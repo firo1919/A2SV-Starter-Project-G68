@@ -6,7 +6,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import React, { useState } from 'react'
 import UserCard from './UserCard'
 import UsersButton from './UsersButton'
-import { deleteUserById } from '@/utils/adminUtils';
+import { useDeleteUserMutation } from '@/lib/redux/api/adminApiSlice'
 
 interface AdminUsersPageTypes {
     initialUsers: UsersType[],
@@ -16,6 +16,7 @@ interface AdminUsersPageTypes {
 const ClientUsersPage = ({initialUsers, total_count}: AdminUsersPageTypes) => {
   const [users, setUsers] = useState(initialUsers)
   const [currentPage, setCurrentPage] = useState(1)
+  const [deleteUser, {error, isLoading}] = useDeleteUserMutation();
   const itemPerPage = 5
 
   const totalPages = Math.ceil(users.length / itemPerPage)
@@ -23,17 +24,17 @@ const ClientUsersPage = ({initialUsers, total_count}: AdminUsersPageTypes) => {
   const lastItemIndex = currentPage * itemPerPage
   const thisPageItems = users.slice(firstItemIndex, lastItemIndex)    
 
-const handleDelete = async (id: string) => {
-    const confirmed = window.confirm("Are you sure you want to delete this user?");
-    if (!confirmed) return;
-
-    const success = await deleteUserById(id);
-    if (success) {
-      setUsers((prev) => prev.filter((user) => user.id !== id));
-    } else {
-      alert("Failed to delete user");
-    }
-  };
+    const handleDelete = async (id: string) => {
+        console.log("handleDelete called with ID:", id); // <== ADD THIS
+        try {
+            const result = await deleteUser({ id:id }).unwrap();
+            console.log("User deleted:", result);
+            setUsers((prev) => prev.filter((user) => user.id !== id));
+        } catch (err) {
+            console.error("Delete failed", err);
+            alert("Failed to delete user");
+        }
+    };
 
   return (
     <div className='flex flex-col gap-4 md:gap-8 items-center'>
@@ -56,7 +57,7 @@ const handleDelete = async (id: string) => {
                 <h2></h2>
             </div>
             {thisPageItems.map((user) => (
-                    <UserCard key={user.id} id={user.id} profile={''} username={user.full_name} user_email={user.email} role={user.role} status={"Active"} onDelete={handleDelete} />
+                    <UserCard key={user.id} id={user.id} profile={''} username={user.full_name} user_email={user.email} role={user.role} status={user.is_active} onDelete={handleDelete} />
                 )
             )}
         </div>
@@ -98,4 +99,4 @@ const handleDelete = async (id: string) => {
   )
 }
 
-export default ClientUsersPage
+export default ClientUsersPage;

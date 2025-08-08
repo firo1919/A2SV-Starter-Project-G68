@@ -25,7 +25,7 @@ export async function getData(): Promise<CycleResponseType | null> {
 
 export async function getUsersData(): Promise<UsersResponseType | null> {
   const session = await auth();
-  const url = `${baseUrl}/admin/users`;
+  const url = `${baseUrl}/admin/users?limit=100`;
   const token = session?.user?.accessToken;
   const role = session?.user?.role;
 
@@ -62,25 +62,5 @@ export async function getUsersData(): Promise<UsersResponseType | null> {
   } catch (error) {
     console.error("Failed to fetch data:", error);
     return null;
-  }
-}
-
-export async function deleteUserById(userId: string): Promise<boolean> {
-  try {
-    const res = await fetch(`/admin/users/${userId}`, {
-      method: 'DELETE',
-    });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error(`Failed to delete user: ${res.status} - ${errorText}`);
-      return false;
-    }
-
-    console.log(`User ${userId} deleted successfully.`);
-    return true;
-  } catch (error) {
-    console.error(`Error deleting user ${userId}:`, error);
-    return false;
   }
 }

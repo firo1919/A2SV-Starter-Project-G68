@@ -11,7 +11,8 @@ export interface UsersType {
     id: string,
     full_name: string,
     email: string,
-    role: string
+    role: string,
+    is_active: boolean
 }
 
 export interface CycleResponseType {

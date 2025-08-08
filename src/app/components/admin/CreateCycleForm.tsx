@@ -5,37 +5,35 @@ import { DevTool } from "@hookform/devtools"
 import { CreateCycle, cycleSchema } from '@/lib/zod/admin/CreateCycle'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'react-toastify'
+import { useCreateCycleMutation } from '@/lib/redux/api/adminApiSlice'
 
-type FormTypes = {
-  name: string
-  start_date: Date
-  end_date: Date
-}
 
 const CreateCycleForm = () => {
+    const [createCycle, {isLoading, error}] = useCreateCycleMutation()
     const form = useForm<CreateCycle>({ resolver: zodResolver(cycleSchema) });
-    const { register, control, handleSubmit, formState } = form;
+    const { register, control, handleSubmit, formState, reset } = form;
     const { errors, isSubmitting, isSubmitted, isSubmitSuccessful } = formState;
-    const [isLoading, setIsLoading] = useState(false);
 
-    function submitFunc (data: CreateCycle) {
-        // write submit function here
-        setIsLoading(true);
-        const cycle = {
-            name: data.name,
-            start_date: data.start_date,
-            end_date: data.end_date,
-            redirectTo: "/admin/cycles",
-        };
 
+    async function submitFunc(data: CreateCycle) {
         try {
+            const result = await createCycle(data).unwrap();
             
-        } catch (error) {
-            toast("Cycle creation failed", { draggable: false, theme: "colored", hideProgressBar: true, type: "error" });
-            console.log(error);
-        }
-        setIsLoading(false);
+            toast.success("Cycle created successfully!", {
+                draggable: false,
+                theme: "colored",
+                hideProgressBar: true,
+        });
+
         reset();
+        } catch (err) {
+        toast.error("Cycle creation failed", {
+            draggable: false,
+            theme: "colored",
+            hideProgressBar: true,
+        });
+        console.error(err);
+        }
     }
 
 
