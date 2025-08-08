@@ -1,8 +1,5 @@
 import Header from "../components/Header";
 
-
-
-
 function HomePage() {
 	const navlinks = [
 		{ href: "#", label: "The Journey" },
@@ -27,9 +24,7 @@ function HomePage() {
 					</button>
 				</div>
 			</Header>
-			<div>
-				HomePage
-			</div>
+			<div>HomePage</div>
 		</>
 	);
 }
