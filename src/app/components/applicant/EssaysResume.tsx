@@ -1,15 +1,24 @@
 "use client";
 import { EssaysResumeFormData } from "@/lib/zod/applicantsSubmitionForm";
+import { useState } from "react";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface Props {
 	register: UseFormRegister<EssaysResumeFormData>;
 	errors: FieldErrors<EssaysResumeFormData>;
-	resume: File | null;
-	setResume: (file: File | null) => void; // add this
 }
 
-export default function EssaysResume({ register, errors, resume, setResume }: Props) {
+export default function EssaysResume({ register, errors }: Props) {
+	const [resume, setResume] = useState("");
+
+	// Function to handle file input change
+	// This is used to update the resume state when a file is selected
+	function onChangeResume(e: React.ChangeEvent<HTMLInputElement>) {
+		const file = e.target.files ? e.target.files[0] : null;
+		const fileName = file ? file.name : "No file chosen";
+		setResume(fileName);
+	}
+
 	return (
 		<div>
 			<h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Essays & Resume</h2>
@@ -63,14 +72,11 @@ export default function EssaysResume({ register, errors, resume, setResume }: Pr
 						type="file"
 						accept=".pdf,.doc,.docx"
 						{...register("resume", {
-							onChange: (e) => {
-								const file = (e.target as HTMLInputElement).files?.[0] ?? null;
-								setResume(file);
-							},
+							onChange: (e) => onChangeResume(e),
 						})}
 					/>
 					{resume ? (
-						<p className="text-sm text-green-600 mt-2">✓ {resume.name}</p>
+						<p className="text-sm text-green-600 mt-2">✓ {resume}</p>
 					) : (
 						<p className="text-sm text-red-500 mt-2">*no file chosen*</p>
 					)}
