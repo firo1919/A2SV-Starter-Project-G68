@@ -7,7 +7,7 @@ export const personalInfoSchema = z.object({
 		.min(1, "ID Number is required")
 		.min(3, "ID Number must be at least 3 characters")
 		.max(20, "ID Number must be less than 20 characters")
-		.regex(/^[A-Za-z0-9-]+$/, "ID Number can only contain letters, numbers, and hyphens"),
+		.regex(/^[A-Za-z0-9-\/]+$/, "ID Number can only contain letters, numbers, and hyphens and forward slashes"),
 	school: z
 		.string()
 		.min(1, "School/University is required")

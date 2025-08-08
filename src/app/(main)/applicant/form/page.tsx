@@ -1,8 +1,17 @@
 "use client";
-import { CodingProfilesFormData, EssaysResumeFormData, PersonalInfoFormData } from "@/lib/zod/applicantsSubmitionForm";
+import {
+	CodingProfilesFormData,
+	codingProfilesSchema,
+	EssaysResumeFormData,
+	essaysResumeSchema,
+	PersonalInfoFormData,
+	personalInfoSchema,
+} from "@/lib/zod/applicantsSubmitionForm";
 import { ApplicationFormData } from "@/types/ApplicationForm";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import Header from "../../../components/Header";
 import CodingProfiles from "../../../components/applicant/CodingProfiles";
 import EssaysResume from "../../../components/applicant/EssaysResume";
@@ -27,7 +36,21 @@ export default function ApplicationForm() {
 		essay_why_a2sv: "",
 		resume: null as File | null,
 	});
-	const [isValid, setIsValid] = useState({ personal: false, coding: false, essays: false });
+	const {
+		register: registerA,
+		handleSubmit: handleSubmitA,
+		formState: { errors: errorsA },
+	} = useForm<PersonalInfoFormData>({ resolver: zodResolver(personalInfoSchema) });
+	const {
+		register: registerB,
+		handleSubmit: handleSubmitB,
+		formState: { errors: errorsB },
+	} = useForm<CodingProfilesFormData>({ resolver: zodResolver(codingProfilesSchema) });
+	const {
+		register: registerC,
+		handleSubmit: handleSubmitC,
+		formState: { errors: errorsC },
+	} = useForm<EssaysResumeFormData>({ resolver: zodResolver(essaysResumeSchema) });
 
 	const steps = [
 		{ id: "personal", label: "Personal Info", number: 1 },
@@ -35,13 +58,21 @@ export default function ApplicationForm() {
 		{ id: "essays", label: "Essays & Resume", number: 3 },
 	];
 
-	const handleNext = () => {
-		if (currentStep === "personal" && isValid.personal) {
-			setCurrentStep("coding");
-		} else if (currentStep === "coding" && isValid.coding) {
-			setCurrentStep("essays");
-		} else if (currentStep === "essays" && isValid.essays && isValid.coding && isValid.personal) {
-			handleSubmit();
+	const handleNext = async () => {
+		if (currentStep === "personal") {
+			await handleSubmitA((data) => {
+				onSubmit(data);
+				setCurrentStep("coding");
+			})();
+		} else if (currentStep === "coding") {
+			await handleSubmitB((data) => {
+				onSubmit(data);
+				setCurrentStep("essays");
+			})();
+		} else if (currentStep === "essays") {
+			await handleSubmitC((data) => {
+				handleFormSubmit(data);
+			})();
 		}
 	};
 
@@ -50,46 +81,33 @@ export default function ApplicationForm() {
 		else if (currentStep === "essays") setCurrentStep("coding");
 	};
 
-	const handleSubmit = () => {
-		console.log(formData);
+	const handleFormSubmit = (data: EssaysResumeFormData) => {
+		console.log(data);
+		setFormData((prev) => ({
+			...prev,
+			essay_about_you: data.essay_about_you,
+			essay_why_a2sv: data.essay_why_a2sv,
+			resume: data.resume,
+		}));
 		const submissionFormData = new FormData();
 		for (const key in formData) {
 			// @ts-expect-error: formData may contain File type which is not assignable to string, but FormData.append accepts File
 			submissionFormData.append(key, formData[key]);
 		}
 		console.log(submissionFormData);
+		router.push("/applicant/success");
 	};
 
-	const handlePersonalInfoSubmit = (data: PersonalInfoFormData | null) => {
-		if (!data) {
-			setIsValid((prev) => ({
-				...prev,
-				personal: false,
-			}));
-		} else {
-			setIsValid((prev) => ({
-				...prev,
-				personal: true,
-			}));
+	function onSubmit(data: PersonalInfoFormData | CodingProfilesFormData) {
+		console.log(data);
+		if ("student_id" in data) {
 			setFormData((prev) => ({
 				...prev,
 				student_id: data.student_id,
 				school: data.school,
 				degreeProgram: data.degreeProgram,
 			}));
-		}
-	};
-	const handleCodingProfilesSubmit = (data: CodingProfilesFormData | null) => {
-		if (!data) {
-			setIsValid((prev) => ({
-				...prev,
-				coding: false,
-			}));
 		} else {
-			setIsValid((prev) => ({
-				...prev,
-				coding: true,
-			}));
 			setFormData((prev) => ({
 				...prev,
 				codeforces_handle: data.codeforces_handle,
@@ -97,26 +115,7 @@ export default function ApplicationForm() {
 				github: data.github,
 			}));
 		}
-	};
-	const handleEssaysAndResumesSubmit = (data: EssaysResumeFormData | null) => {
-		if (!data) {
-			setIsValid((prev) => ({
-				...prev,
-				essays: false,
-			}));
-		} else {
-			setIsValid((prev) => ({
-				...prev,
-				essays: true,
-			}));
-			setFormData((prev) => ({
-				...prev,
-				essay_about_you: data.essay_about_you,
-				essay_why_a2sv: data.essay_why_a2sv,
-				resume: data.resume,
-			}));
-		}
-	};
+	}
 
 	const getCurrentStepIndex = () => {
 		return steps.findIndex((step) => step.id === currentStep);
@@ -197,9 +196,11 @@ export default function ApplicationForm() {
 					{/* Form Content */}
 					<div className="px-4 sm:px-8 pb-6 sm:pb-8">
 						<div className="min-h-[100px] sm:min-h-[200px]">
-							{currentStep === "personal" && <PersonalInfo updateFormData={handlePersonalInfoSubmit} />}
-							{currentStep === "coding" && <CodingProfiles updateFormData={handleCodingProfilesSubmit} />}
-							{currentStep === "essays" && <EssaysResume updateFormData={handleEssaysAndResumesSubmit} />}
+							{currentStep === "personal" && <PersonalInfo errors={errorsA} register={registerA} />}
+							{currentStep === "coding" && <CodingProfiles errors={errorsB} register={registerB} />}
+							{currentStep === "essays" && (
+								<EssaysResume resume={formData.resume} errors={errorsC} register={registerC} />
+							)}
 						</div>
 
 						{/* Navigation Buttons */}
@@ -217,7 +218,7 @@ export default function ApplicationForm() {
 							</button>
 							{currentStep === "essays" ? (
 								<button
-									onClick={handleSubmit}
+									onClick={handleNext}
 									className="px-4 sm:px-6 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
 								>
 									Submit

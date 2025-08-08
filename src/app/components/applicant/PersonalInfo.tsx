@@ -1,32 +1,11 @@
-import { PersonalInfoFormData, personalInfoSchema } from "@/lib/zod/applicantsSubmitionForm";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { PersonalInfoFormData } from "@/lib/zod/applicantsSubmitionForm";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface Props {
-	updateFormData: (data: PersonalInfoFormData | null) => void;
+	register: UseFormRegister<PersonalInfoFormData>;
+	errors: FieldErrors<PersonalInfoFormData>;
 }
-export default function PersonalInfo({ updateFormData }: Props) {
-	const {
-		register,
-		trigger,
-		getValues,
-		watch,
-		formState: { errors },
-	} = useForm<PersonalInfoFormData>({ resolver: zodResolver(personalInfoSchema) });
-
-	useEffect(() => {
-		const subscription = watch(async () => {
-			const isValid = await trigger();
-			if (isValid) {
-				const data = getValues();
-				updateFormData(data);
-			} else {
-				updateFormData(null);
-			}
-		});
-		return () => subscription.unsubscribe();
-	}, [watch, trigger, getValues, updateFormData]);
+export default function PersonalInfo({ register, errors }: Props) {
 	return (
 		<form>
 			<h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Personal Information</h2>

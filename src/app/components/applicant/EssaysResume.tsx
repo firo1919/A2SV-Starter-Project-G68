@@ -1,39 +1,14 @@
 "use client";
-import { EssaysResumeFormData, essaysResumeSchema } from "@/lib/zod/applicantsSubmitionForm";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { EssaysResumeFormData } from "@/lib/zod/applicantsSubmitionForm";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface Props {
-	updateFormData: (data: EssaysResumeFormData | null) => void;
+	register: UseFormRegister<EssaysResumeFormData>;
+	errors: FieldErrors<EssaysResumeFormData>;
+	resume: File | null;
 }
 
-export default function EssaysResume({ updateFormData }: Props) {
-	const {
-		register,
-		trigger,
-		getValues,
-		watch,
-		formState: { errors },
-	} = useForm<EssaysResumeFormData>({ resolver: zodResolver(essaysResumeSchema) });
-	useEffect(() => {
-		const subscription = watch(async () => {
-			const isValid = await trigger();
-			if (isValid) {
-				let data = getValues();
-				const fileList = getValues("resume"); // FileList
-				const resume = fileList?.[0]; //
-				data = {
-					...data,
-					resume: resume,
-				};
-				updateFormData(data);
-			} else {
-				updateFormData(null);
-			}
-		});
-		return () => subscription.unsubscribe();
-	}, [watch, trigger, getValues, updateFormData]);
+export default function EssaysResume({ register, errors, resume }: Props) {
 	return (
 		<div>
 			<h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Essays & Resume</h2>
@@ -74,14 +49,25 @@ export default function EssaysResume({ updateFormData }: Props) {
 					<label className="block text-sm font-medium text-gray-700 mb-2">Resume</label>
 					<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
 						<span className="text-sm text-gray-500">Upload your resume</span>
-						<button
-							type="button"
+						<label
+							htmlFor="submitform"
 							className="px-2 py-1.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-xs"
 						>
 							Choose File
-						</button>
+						</label>
 					</div>
-					<input type="file" accept=".pdf,.doc,.docx" {...register("resume")} />
+					<input
+						id="submitform"
+						className="hidden"
+						type="file"
+						accept=".pdf,.doc,.docx"
+						{...register("resume")}
+					/>
+					{resume ? (
+						<p className="text-sm text-green-600 mt-2">✓ {resume.name}</p>
+					) : (
+						<p className="text-sm text-red-500 mt-2">*no file chosen*</p>
+					)}
 					{typeof errors.resume?.message === "string" && (
 						<p className="text-red-600 text-sm">{errors.resume.message}</p>
 					)}
