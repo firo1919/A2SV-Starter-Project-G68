@@ -51,9 +51,9 @@ function LoginForm({ error }: Props) {
 		reset();
 	}
 	return (
-		<div className="relative flex flex-col items-center gap-7 text-ebony">
+		<div className="relative flex flex-col items-center gap-6 text-ebony">
 			<Image
-				className="w-20 md:w-32 h-auto"
+				className="w-26 md:w-32 h-auto"
 				src="/images/a2sv-logo2.png"
 				alt="A2SV logo image"
 				width={128}

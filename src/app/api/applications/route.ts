@@ -18,7 +18,15 @@ export async function POST(req: Request) {
 	const essay_why_a2sv = formData.get("essay_why_a2sv") as string | null;
 	const essay_about_you = formData.get("essay_about_you") as string | null;
 
-	if (!resume || !school || !student_id || !leetcode_handle || !codeforces_handle || !essay_why_a2sv || !essay_about_you) {
+	if (
+		!resume ||
+		!school ||
+		!student_id ||
+		!leetcode_handle ||
+		!codeforces_handle ||
+		!essay_why_a2sv ||
+		!essay_about_you
+	) {
 		return NextResponse.json({ detail: "Missing required fields" }, { status: 400 });
 	}
 
@@ -36,7 +44,7 @@ export async function POST(req: Request) {
 	const API_BASE = process.env.API_BASE;
 	if (!API_BASE) {
 		console.error("API_BASE is not set in the environment");
-		return NextResponse.json({ detail: "Server configuration error" }, { status: 500 });
+		return NextResponse.json({ success: false });
 	}
 
 	try {
@@ -51,12 +59,12 @@ export async function POST(req: Request) {
 		const data = await response.json();
 
 		if (!response.ok) {
-			return NextResponse.json(data, { status: response.status });
+			return NextResponse.json({ success: false, data });
 		}
 
 		return NextResponse.json({ success: true, data });
 	} catch (error) {
 		console.error("Application submission error:", error);
-		return NextResponse.json({ detail: "Something went wrong!" }, { status: 500 });
+		return NextResponse.json({ success: false });
 	}
 }
