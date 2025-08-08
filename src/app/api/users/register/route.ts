@@ -1,8 +1,10 @@
-import { AuthResponse, User } from "@/types/auth";
+import { User } from "@/types/auth";
+import { RouteHandlerResponse } from "@/types/RouteHandler";
+import { NextResponse } from "next/server";
 
 const baseUrl = process.env.API_BASE;
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<NextResponse<RouteHandlerResponse>> {
 	try {
 		const data: User = await request.json();
 		const response = await fetch(`${baseUrl}/auth/register`, {
@@ -11,17 +13,22 @@ export async function POST(request: Request) {
 			body: JSON.stringify(data),
 		});
 
-		const res: AuthResponse = await response.json();
+		const res = await response.json();
 
-		return new Response(JSON.stringify(res), {
-			status: response.status,
-			headers: { "Content-Type": "application/json" },
-		});
+		const responseBody: RouteHandlerResponse = {
+			success: response.ok,
+			message: res.message || (response.ok ? "Registration successful" : "Registration failed"),
+			data: res,
+		};
+
+		return NextResponse.json(responseBody, { status: response.status });
 	} catch (error) {
 		console.log(error);
-		return new Response(JSON.stringify({ success: false, message: "Internal Server Error" }), {
-			status: 500,
-			headers: { "Content-Type": "application/json" },
-		});
+		const responseBody: RouteHandlerResponse = {
+			success: false,
+			message: "Internal Server Error",
+			data: null,
+		};
+		return NextResponse.json(responseBody, { status: 500 });
 	}
 }

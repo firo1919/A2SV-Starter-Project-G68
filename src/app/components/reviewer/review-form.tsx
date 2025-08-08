@@ -1,83 +1,132 @@
 'use client';
-import React from 'react';
-import { useState } from 'react';
-import { useActionState } from 'react';
+
+import { useState, useActionState } from 'react';
 import { CustomButton } from './custom-button';
-import { updateApplicationReview } from '@/app/reviews/actions';
+import { updateApplicationReview } from '@/app/(main)/reviewer/actions';
 import { ApplicationStatus } from './types';
 import { cn } from './utils';
 
 interface ReviewFormProps {
   applicationId: string;
   currentComments?: string;
-  currentScore?: number;
+  currentResumeScore?: number;
+  currentEssayScore?: number;
   currentStatus?: ApplicationStatus;
 }
 
 export default function ReviewForm({
   applicationId,
   currentComments = '',
-  currentScore,
+  currentResumeScore,
+  currentEssayScore,
   currentStatus = 'new',
 }: ReviewFormProps) {
-  const [state, formAction, isPending] = useActionState(updateApplicationReview, null);
   const [comments, setComments] = useState(currentComments);
-  const [score, setScore] = useState<number | ''>(currentScore !== undefined ? currentScore : '');
+  const [resumeScore, setResumeScore] = useState<number | ''>(
+    currentResumeScore ?? ''
+  );
+  const [essayScore, setEssayScore] = useState<number | ''>(
+    currentEssayScore ?? ''
+  );
   const [status, setStatus] = useState<ApplicationStatus>(currentStatus);
 
-  return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const reviewComments = formData.get('reviewerComments') as string;
-        const reviewScore = formData.get('score') ? parseInt(formData.get('score') as string) : undefined;
-        const reviewStatus = formData.get('status') as ApplicationStatus;
+  const [state, formAction, isPending] = useActionState(
+    async (_prevState: any, formData: FormData) => {
+      const activityCheckNotes = formData.get('activityCheckNotes') as string;
+      const submittedResumeScore = formData.get('resumeScore')
+        ? parseInt(formData.get('resumeScore') as string)
+        : undefined;
+      const submittedEssayScore = formData.get('essayScore')
+        ? parseInt(formData.get('essayScore') as string)
+        : undefined;
+      const submittedStatus = formData.get('status') as ApplicationStatus;
 
-        await formAction(applicationId, {
-          reviewerComments: reviewComments,
-          score: reviewScore,
-          status: reviewStatus,
-        });
-      }}
-      className="space-y-6"
-    >
-      <h3 className="text-2xl font-semibold text-gray-900 mb-4">Submit/Update Review</h3>
+      return await updateApplicationReview(applicationId, {
+        activityCheckNotes,
+        resumeScore: submittedResumeScore,
+        essayScore: submittedEssayScore,
+        status: submittedStatus,
+      });
+    },
+    null
+  );
+
+  return (
+    <form action={formAction} className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900 mb-4">Review Details</h3>
 
       <div>
-        <label htmlFor="reviewerComments" className="block text-sm font-medium text-gray-700 mb-1">
-          Reviewer Comments
+        <label
+          htmlFor="activityCheckNotes"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Activity Check Notes
         </label>
         <textarea
-          id="reviewerComments"
-          name="reviewerComments"
+          id="activityCheckNotes"
+          name="activityCheckNotes"
           value={comments}
           onChange={(e) => setComments(e.target.value)}
-          placeholder="Enter your review comments here..."
+          placeholder="Enter your activity check notes here..."
           rows={5}
-          className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
 
-      <div>
-        <label htmlFor="score" className="block text-sm font-medium text-gray-700 mb-1">
-          Score (0-100)
-        </label>
-        <input
-          type="number"
-          id="score"
-          name="score"
-          value={score}
-          onChange={(e) => setScore(e.target.value === '' ? '' : parseInt(e.target.value))}
-          min="0"
-          max="100"
-          placeholder="e.g., 85"
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label
+            htmlFor="resumeScore"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Resume Score (0-100)
+          </label>
+          <input
+            type="number"
+            id="resumeScore"
+            name="resumeScore"
+            value={resumeScore}
+            onChange={(e) =>
+              setResumeScore(
+                e.target.value === '' ? '' : parseInt(e.target.value)
+              )
+            }
+            min="0"
+            max="100"
+            placeholder="e.g., 85"
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="essayScore"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Essay Score (0-100)
+          </label>
+          <input
+            type="number"
+            id="essayScore"
+            name="essayScore"
+            value={essayScore}
+            onChange={(e) =>
+              setEssayScore(
+                e.target.value === '' ? '' : parseInt(e.target.value)
+              )
+            }
+            min="0"
+            max="100"
+            placeholder="e.g., 90"
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+          />
+        </div>
       </div>
 
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="status"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           Application Status
         </label>
         <div className="relative">
@@ -86,7 +135,7 @@ export default function ReviewForm({
             name="status"
             value={status}
             onChange={(e) => setStatus(e.target.value as ApplicationStatus)}
-            className="block w-full appearance-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-8"
+            className="block w-full appearance-none rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:cursor-not-allowed disabled:opacity-50 pr-8"
           >
             <option value="new">New</option>
             <option value="under-review">Under Review</option>
@@ -104,12 +153,21 @@ export default function ReviewForm({
         </div>
       </div>
 
-      <CustomButton type="submit" variant="purple" disabled={isPending}>
-        {isPending ? 'Submitting...' : 'Submit Review'}
+      <CustomButton
+        type="submit"
+        variant="purple"
+        disabled={isPending}
+        className="w-full"
+      >
+        {isPending ? 'Saving...' : 'Save & Submit Review'}
       </CustomButton>
 
       {state?.message && (
-        <p className={`mt-4 text-sm ${state.success ? 'text-green-600' : 'text-red-600'}`}>
+        <p
+          className={`mt-4 text-sm text-center ${
+            state.success ? 'text-green-600' : 'text-red-600'
+          }`}
+        >
           {state.message}
         </p>
       )}

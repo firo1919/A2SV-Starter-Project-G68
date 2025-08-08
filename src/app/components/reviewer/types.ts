@@ -6,6 +6,22 @@ export interface Application {
   submittedDate: string;
   status: ApplicationStatus;
   avatarUrl: string;
-  reviewerComments?: string;
-  score?: number;
+  // New fields from Applicant Profile
+  school?: string;
+  degreeProgram?: string;
+  codingProfiles?: {
+    github?: string;
+    leetcode?: string;
+    codeforces?: string;
+  };
+  essay1?: string;
+  essay2?: string;
+  resumeUrl?: string;
+
+  activityCheckNotes?: string; 
+  resumeScore?: number;
+  essayScore?: number;
+  
+  reviewerComments?: string; 
+  score?: number; 
 }

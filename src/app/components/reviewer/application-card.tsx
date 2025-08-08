@@ -1,51 +1,50 @@
-'use client' // <--- THIS IS CRUCIAL FOR LINK TO WORK
+'use client';
 
-import Image from "next/image"
-import Link from "next/link" // Import Link
-import { CustomButton } from "./custom-button"
-import { Application, ApplicationStatus } from "./types"
-import { cn } from "./utils"
+import Image from 'next/image';
+import Link from 'next/link';
+import { CustomButton } from './custom-button';
+import { Application, ApplicationStatus } from './types';
+import { cn } from './utils';
 
 interface ApplicationCardProps {
-  application: Application
+  application: Application;
 }
 
 export default function ApplicationCard({ application }: ApplicationCardProps) {
   const getStatusClasses = (status: ApplicationStatus) => {
     switch (status) {
-      case "under-review":
-        return "bg-yellow-100 text-yellow-800";
-      case "review-complete":
-        return "bg-green-100 text-green-800";
-      case "new":
-        return "bg-blue-100 text-blue-800";
+      case 'under-review':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'review-complete':
+        return 'bg-green-100 text-green-800';
+      case 'new':
+        return 'bg-blue-100 text-blue-800';
       default:
-        return "";
+        return '';
     }
   };
 
   const getButtonProps = (status: ApplicationStatus) => {
     switch (status) {
-      case "under-review":
-        return { text: "Continue Review", variant: "purple" };
-      case "review-complete":
-        return { text: "View Details", variant: "outline" };
-      case "new":
-        return { text: "Start Review", variant: "purple" };
+      case 'under-review':
+        return { text: 'Continue Review', variant: 'purple' as const };
+      case 'review-complete':
+        return { text: 'View Details', variant: 'outline' as const };
+      case 'new':
+        return { text: 'Start Review', variant: 'purple' as const };
       default:
-        return { text: "View Details", variant: "outline" };
+        return { text: 'View Details', variant: 'outline' as const };
     }
   };
 
   const buttonProps = getButtonProps(application.status);
 
   return (
-    // Ensure the entire card is wrapped in a Link component
-    <Link href={`/reviews/${application.id}`} className="block">
+    <Link href={`/reviews/${application.id}`} passHref>
       <div className="bg-white rounded-lg shadow-sm p-6 flex flex-col border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
         <div className="flex items-center gap-4 mb-4">
           <Image
-            src={application.avatarUrl || "/placeholder.svg?height=48&width=48&text=Avatar"}
+            src={application.avatarUrl || '/placeholder.svg?height=48&width=48&text=Avatar'}
             alt={`${application.name}'s avatar`}
             width={48}
             height={48}
@@ -59,14 +58,15 @@ export default function ApplicationCard({ application }: ApplicationCardProps) {
         <div className="mb-6">
           <span
             className={cn(
-              "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
+              'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium',
               getStatusClasses(application.status)
             )}
           >
-            {application.status.replace(/-/g, ' ').replace(/\b\w/g, char => char.toUpperCase())}
+            {application.status
+              .replace(/-/g, ' ')
+              .replace(/\b\w/g, (char) => char.toUpperCase())}
           </span>
         </div>
-        {/* The button inside the link will also navigate, consider if you want a separate action */}
         <CustomButton variant={buttonProps.variant} className="w-full mt-auto">
           {buttonProps.text}
         </CustomButton>
