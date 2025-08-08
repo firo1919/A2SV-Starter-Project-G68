@@ -1,11 +1,11 @@
+import { RouteHandlerResponse } from "@/types/RouteHandler";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { CreateApplicationResponse } from "../types/applications";
 
 export const applicationsAPi = createApi({
 	reducerPath: "applicationsApi",
 	baseQuery: fetchBaseQuery({ baseUrl: "/api/applications/" }),
 	endpoints: (builder) => ({
-		createApplication: builder.mutation<CreateApplicationResponse, FormData>({
+		createApplication: builder.mutation<RouteHandlerResponse, FormData>({
 			query: (data) => ({
 				url: "",
 				method: "POST",
