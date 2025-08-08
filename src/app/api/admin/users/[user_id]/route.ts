@@ -1,3 +1,4 @@
+//app/api/admin/users/[user_id].route.ts
 import { auth } from "@/auth";
 import { RouteHandlerResponse } from "@/types/RouteHandler";
 import { NextRequest, NextResponse } from "next/server";
@@ -55,11 +56,9 @@ export async function DELETE(
 		return NextResponse.json({ success: false, message: "Not authenticated", data: null });
 	}
 
-	const { user_id } = params;
+	const { user_id } = await params;
 
 	try {
-		const body = await req.json();
-		const { full_name } = body;
 
 		const response = await fetch(`${API_BASE}/admin/users/${user_id}`, {
 			method: "DELETE",
@@ -67,7 +66,6 @@ export async function DELETE(
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${session.user.accessToken}`,
 			},
-			body: JSON.stringify({ full_name }),
 		});
 
 		const data = await response.json();
