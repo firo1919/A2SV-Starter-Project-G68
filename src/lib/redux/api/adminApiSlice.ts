@@ -54,4 +54,4 @@ export const adminApi = createApi({
 	}),
 });
 
-export const {} = adminApi;
+export const {useActivateCycleMutation, useCreateCycleMutation, useCreateUserMutation, useDeleteCycleMutation, useDeleteUserMutation, useUpdateCycleMutation, useUpdateUserMutation} = adminApi;
