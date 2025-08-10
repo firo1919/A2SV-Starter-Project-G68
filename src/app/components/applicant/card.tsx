@@ -1,10 +1,29 @@
+"use client";
 import React from "react";
+import { useGetApplicationStatusQuery } from "@/lib/redux/api/applicationsApiSlice";
+import { ApplicationStatus } from "@/types/ApplicationForm";
 
 interface CardProps {
 	type: "dashboard" | "progress";
 }
 
 export default function Card({ type }: CardProps) {
+	const { data: response } = useGetApplicationStatusQuery();
+
+	const applicationStatus: ApplicationStatus | null =
+		response?.success && response.data && typeof response.data === "object" && "data" in response.data
+			? (response.data.data as ApplicationStatus)
+			: null;
+
+	// Helper function to format date
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
+	};
+
 	const cardStyle =
 		type === "dashboard"
 			? "grid grid-cols-1 gap-4 justify-items-center w-full max-w-sm sm:max-w-md md:max-w-[384px] mx-auto"
@@ -78,29 +97,46 @@ export default function Card({ type }: CardProps) {
 						<div className="shadow-xl bg-white rounded-[8px] p-[24px] w-full">
 							<h1 className="text-lg font-semibold mb-5 text-left">Recent Activity</h1>
 							<div className="flex flex-col gap-4">
-								<div className="flex items-center gap-3">
-									<div className="rounded-full p-2 flex items-center justify-center">
-										<img
-											src="/images/image.png"
-											alt="Application Submitted"
-											className="w-10 h-10"
-										/>
+								{applicationStatus && (
+									<div className="flex items-center gap-3">
+										<div className="rounded-full p-2 flex items-center justify-center">
+											<img
+												src="/images/image.png"
+												alt="Application Submitted"
+												className="w-10 h-10"
+											/>
+										</div>
+										<div>
+											<p className="text-base font-semibold text-gray-700">
+												Application Submitted
+											</p>
+											<p className="text-sm text-gray-400">
+												{applicationStatus.submitted_at
+													? formatDate(applicationStatus.submitted_at)
+													: "Date not available"}
+											</p>
+										</div>
 									</div>
-									<div>
-										<p className="text-base font-semibold text-gray-700">Application Submitted</p>
-
-										<p className="text-sm text-gray-400">October 26, 2023</p>
+								)}
+								{applicationStatus && applicationStatus.status === "interview" && (
+									<div className="flex items-center gap-3">
+										<div className=" rounded-full p-2 flex ">
+											<img
+												src="/images/img2.png"
+												alt="Interview Scheduled"
+												className="w-10 h-10"
+											/>
+										</div>
+										<div>
+											<p className="text-base font-semibold text-gray-700">Interview Scheduled</p>
+											<p className="text-sm text-gray-400">
+												{applicationStatus.updated_at
+													? formatDate(applicationStatus.updated_at)
+													: "Date not available"}
+											</p>
+										</div>
 									</div>
-								</div>
-								<div className="flex items-center gap-3">
-									<div className=" rounded-full p-2 flex ">
-										<img src="/images/img2.png" alt="Interview Scheduled" className="w-10 h-10" />
-									</div>
-									<div>
-										<p className="text-base font-semibold text-gray-700">Interview Scheduled</p>
-										<p className="text-sm text-gray-400">November 5, 2023</p>
-									</div>
-								</div>
+								)}
 							</div>
 						</div>
 						<div className="shadow-xl bg-white rounded-[8px] p-[24px] w-full">

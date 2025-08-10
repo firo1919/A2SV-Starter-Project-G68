@@ -79,3 +79,46 @@ export async function POST(req: Request): Promise<NextResponse<RouteHandlerRespo
 		return NextResponse.json({ success: false, message: "Application submission error", data: null });
 	}
 }
+
+export async function GET(req: Request): Promise<NextResponse<RouteHandlerResponse>> {
+	const session = await auth();
+
+	if (!session?.user?.accessToken) {
+		return NextResponse.json({
+			success: false,
+			message: "Not authenticated",
+			data: null,
+		});
+	}
+
+	const API_BASE = process.env.API_BASE;
+	if (!API_BASE) {
+		console.error("API_BASE is not set in the environment");
+		return NextResponse.json({ success: false, message: "API_BASE is not set in the environment", data: null });
+	}
+
+	try {
+		console.log("Fetching from backend:", `${API_BASE}/applications/my-status`);
+		console.log("With token:", session.user.accessToken ? "Token present" : "No token");
+		
+		const response = await fetch(`${API_BASE}/applications/my-status`, {
+			method: "GET",
+			headers: {
+				Authorization: `Bearer ${session.user.accessToken}`,
+			},
+		});
+
+		console.log("Backend response status:", response.status);
+		const data = await response.json();
+		console.log("Backend response data:", data);
+
+		if (!response.ok) {
+			return NextResponse.json({ success: false, message: "Failed to fetch application status", data });
+		}
+
+		return NextResponse.json({ success: true, message: "Application status fetched successfully", data });
+	} catch (error) {
+		console.error("Application status fetch error:", error);
+		return NextResponse.json({ success: false, message: "Application status fetch error", data: null });
+	}
+}

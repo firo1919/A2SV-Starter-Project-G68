@@ -31,6 +31,12 @@ export const applicationsAPi = createApi({
 				method: "PATCH",
 			}),
 		}),
+		getApplicationStatus: builder.query<RouteHandlerResponse, void>({
+			query: () => ({
+				url: "my-status",
+				method: "GET",
+			}),
+		}),
 	}),
 });
 
@@ -39,4 +45,5 @@ export const {
 	useDeleteApplicationMutation,
 	useSubmitApplicationMutation,
 	useUpdateApplicationMutation,
+	useGetApplicationStatusQuery,
 } = applicationsAPi;

@@ -17,13 +17,21 @@ import CodingProfiles from "../../../components/applicant/CodingProfiles";
 import EssaysResume from "../../../components/applicant/EssaysResume";
 import PersonalInfo from "../../../components/applicant/PersonalInfo";
 import { useCreateApplicationMutation } from "@/lib/redux/api/applicationsApiSlice";
+import { useGetProfileQuery } from "@/lib/redux/api/profileApiSlice";
+import { useSession, signOut } from "next-auth/react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react";
 
 type FormStep = "personal" | "coding" | "essays";
 
 export default function ApplicationForm() {
 	const router = useRouter();
 	const [currentStep, setCurrentStep] = useState<FormStep>("personal");
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [createApplication] = useCreateApplicationMutation();
+	const { data: profileResponse } = useGetProfileQuery();
+	const { data: session } = useSession();
 	const [formData, setFormData] = useState<ApplicationFormData>({
 		// Personal Info
 		student_id: "",
@@ -72,9 +80,21 @@ export default function ApplicationForm() {
 				setCurrentStep("essays");
 			})();
 		} else if (currentStep === "essays") {
-			await handleSubmitC((data) => {
-				handleFormSubmit(data);
-			})();
+			await handleSubmitC(
+				async (data) => {
+					await handleFormSubmit(data);
+				},
+				(errors) => {
+					toast.error(
+						"Please fill in all required fields correctly. Essays must be at least 50 characters long.",
+						{
+							draggable: false,
+							theme: "colored",
+							hideProgressBar: true,
+						}
+					);
+				}
+			)();
 		}
 	};
 
@@ -83,38 +103,99 @@ export default function ApplicationForm() {
 		else if (currentStep === "essays") setCurrentStep("coding");
 	};
 
-	const handleFormSubmit = (data: EssaysResumeFormData) => {
-		console.log(data);
-		setFormData((prev) => ({
-			...prev,
+	const handleFormSubmit = async (data: EssaysResumeFormData) => {
+		setIsSubmitting(true);
+
+		// Create the complete form data object
+		const finalFormData = {
+			...formData,
 			essay_about_you: data.essay_about_you,
 			essay_why_a2sv: data.essay_why_a2sv,
 			resume: data.resume,
-		}));
+		};
+
+		// Create FormData with all the collected form data
 		const submissionFormData = new FormData();
-		for (const key in formData) {
-			// @ts-expect-error: formData may contain File type which is not assignable to string, but FormData.append accepts File
-			submissionFormData.append(key, formData[key]);
+
+		for (const key in finalFormData) {
+			const value = finalFormData[key as keyof typeof finalFormData];
+			if (value !== null && value !== undefined && value !== "") {
+				submissionFormData.append(key, value);
+			}
 		}
-		console.log(submissionFormData);
-		router.push("/applicant/success");
+
+		try {
+			// Actually call the API to submit the application
+			const result = await createApplication(submissionFormData).unwrap();
+
+			if (result.success) {
+				// Show success message and redirect
+				toast.success("Application submitted successfully!", {
+					draggable: false,
+					theme: "colored",
+					hideProgressBar: true,
+				});
+				router.push("/applicant/success");
+			} else {
+				// Show error message with more details from the backend
+				const backendMessage = (result.data as any)?.message || result.message;
+
+				// Check if it's a duplicate application error
+				if (backendMessage && backendMessage.includes("already submitted")) {
+					toast.info("You already have a submitted application. Redirecting to your application status...", {
+						draggable: false,
+						theme: "colored",
+						hideProgressBar: true,
+					});
+					// Redirect to the progress page to show application status
+					setTimeout(() => {
+						router.push("/applicant/progress");
+					}, 2000);
+				} else {
+					toast.error(`Failed to submit application: ${backendMessage}`, {
+						draggable: false,
+						theme: "colored",
+						hideProgressBar: true,
+					});
+				}
+			}
+		} catch (error: any) {
+			console.error("Error submitting application:", error);
+			const errorMessage =
+				error?.data?.message ||
+				error?.message ||
+				"An error occurred while submitting your application. Please try again.";
+			toast.error(errorMessage, {
+				draggable: false,
+				theme: "colored",
+				hideProgressBar: true,
+			});
+		} finally {
+			setIsSubmitting(false);
+		}
 	};
 
 	function onSubmit(data: PersonalInfoFormData | CodingProfilesFormData) {
-		console.log(data);
 		if ("student_id" in data) {
-			setFormData((prev) => ({
-				...prev,
-				student_id: data.student_id,
-				school: data.school,
-				degreeProgram: data.degreeProgram,
-			}));
+			setFormData((prev) => {
+				const newData = {
+					...prev,
+					student_id: data.student_id,
+					school: data.school,
+					degree: data.degreeProgram,
+					country: data.country,
+				};
+				return newData;
+			});
 		} else {
-			setFormData((prev) => ({
-				...prev,
-				codeforces_handle: data.codeforces_handle,
-				leetcode_handle: data.leetcode_handle,
-			}));
+			setFormData((prev) => {
+				const newData = {
+					...prev,
+					codeforces_handle: data.codeforces_handle,
+					leetcode_handle: data.leetcode_handle,
+				};
+				return newData;
+			});
 		}
 	}
 
@@ -122,15 +203,24 @@ export default function ApplicationForm() {
 		return steps.findIndex((step) => step.id === currentStep);
 	};
 
+	// Get name from profile or session with fallback
+	const profileData =
+		profileResponse?.success && (profileResponse.data as any)?.data ? (profileResponse.data as any).data : null;
+	let userName = profileData?.full_name || (session?.user as any)?.name || "Applicant Name";
+
+	const handleLogout = () => {
+		signOut();
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Header */}
 			<Header>
 				<div className="flex items-center space-x-4">
-					<span className="text-gray-700">John Doe</span>
-					<button className="font-semibold text-gray-400 hover:text-gray-600 transition-colors">
+					<span className="text-gray-700">{userName}</span>
+					<p className="text-sm font-semibold text-gray-400 cursor-pointer" onClick={handleLogout}>
 						Logout
-					</button>
+					</p>
 				</div>
 			</Header>
 
@@ -218,9 +308,14 @@ export default function ApplicationForm() {
 							{currentStep === "essays" ? (
 								<button
 									onClick={handleNext}
-									className="px-4 sm:px-6 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+									disabled={isSubmitting}
+									className={`px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg font-medium transition-colors text-sm ${
+										isSubmitting
+											? "bg-gray-400 text-white cursor-not-allowed"
+											: "bg-blue-600 text-white hover:bg-blue-700"
+									}`}
 								>
-									Submit
+									{isSubmitting ? "Submitting..." : "Submit"}
 								</button>
 							) : (
 								<button
@@ -234,6 +329,7 @@ export default function ApplicationForm() {
 					</div>
 				</div>
 			</div>
+			<ToastContainer />
 		</div>
 	);
 }
