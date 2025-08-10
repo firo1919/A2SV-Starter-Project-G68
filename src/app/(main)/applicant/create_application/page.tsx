@@ -134,8 +134,13 @@ export default function ApplicationForm() {
 					draggable: false,
 					theme: "colored",
 					hideProgressBar: true,
+					autoClose: 4000,
 				});
-				router.push("/applicant/success");
+
+				// Redirect to progress page after a short delay to show the toast
+				setTimeout(() => {
+					router.push("/applicant/progress?newSubmission=true");
+				}, 1500);
 			} else {
 				// Show error message with more details from the backend
 				const backendMessage = (result.data as any)?.message || result.message;

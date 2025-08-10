@@ -1,18 +1,20 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Card from "../../../components/applicant/card";
 import ApplicationTimeline from "../../../components/applicant/applicationTimeline";
 import Header from "../../../components/Header";
 import BurgerMenu from "@/app/components/BurgerMenu";
 import { useGetProfileQuery } from "@/lib/redux/api/profileApiSlice";
 import { useSession, signOut } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Progress() {
 	const { data: profileResponse, isLoading: profileLoading } = useGetProfileQuery();
 	const { data: session } = useSession();
+	const searchParams = useSearchParams();
 
 	// Get name from profile or session with fallback
 	const profileData =
@@ -55,18 +57,18 @@ export default function Progress() {
 				</div>
 			</Header>
 			<main className="flex-grow flex flex-col items-center justify-start">
-				<div className="w-full max-w-6xl px-4">
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 items-start justify-center">
-						<div>
-							<div className="mb-6">
-								<h1 className="text-2xl font-semibold mb-2">Your Application Progress</h1>
+				<div className="w-full max-w-6xl px-4 sm:px-6">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mt-6 sm:mt-8 lg:mt-10 items-start justify-center">
+						<div className="order-1 lg:order-1">
+							<div className="mb-4 sm:mb-6">
+								<h1 className="text-xl sm:text-2xl font-semibold mb-2">Your Application Progress</h1>
 								<p className="text-sm text-gray-600">
 									You're on your way! Here's a summary of your application status.
 								</p>
 							</div>
 							<ApplicationTimeline />
 						</div>
-						<div>
+						<div className="order-2 lg:order-2">
 							<Card type="progress" />
 						</div>
 					</div>
