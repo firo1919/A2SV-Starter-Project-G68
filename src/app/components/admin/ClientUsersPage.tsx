@@ -57,7 +57,7 @@ const ClientUsersPage = ({initialUsers, total_count}: AdminUsersPageTypes) => {
                 <h2></h2>
             </div>
             {thisPageItems.map((user) => (
-                    <UserCard key={user.id} id={user.id} profile={''} username={user.full_name} user_email={user.email} role={user.role} status={user.is_active} onDelete={handleDelete} />
+                    <UserCard key={user.id} id={user.id} profile={user.profile} username={user.full_name} user_email={user.email} role={user.role} status={user.is_active} onDelete={handleDelete} />
                 )
             )}
         </div>
