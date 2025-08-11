@@ -8,14 +8,14 @@ export const managerAPi = createApi({
 		assignReviewer: builder.mutation<RouteHandlerResponse, { reviewer: AssignedReviewer; id: string }>({
 			query: (data) => ({
 				url: `${data.id}/assign`,
-				method: "POST",
+				method: "PATCH",
 				body: data.reviewer,
 			}),
 		}),
 		decideApplication: builder.mutation<RouteHandlerResponse, { decision: ApplicationDesicion; id: string }>({
 			query: (data) => ({
 				url: `${data.id}/decide`,
-				method: "POST",
+				method: "PATCH",
 				body: data.decision,
 			}),
 		}),

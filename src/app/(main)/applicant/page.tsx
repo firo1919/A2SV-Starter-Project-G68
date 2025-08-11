@@ -1,10 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import Dashboard from "./dashboard/page";
-import Progress from "./progress/page";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-	const [showProgress, setShowProgress] = useState(false);
+	const router = useRouter();
 
-	return <>{!showProgress ? <Dashboard onStartApplication={() => setShowProgress(true)} /> : <Progress />}</>;
+	useEffect(() => {
+		router.push("/applicant/dashboard");
+	}, [router]);
+
+	return null;
 }
