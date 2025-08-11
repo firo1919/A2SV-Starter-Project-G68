@@ -36,7 +36,7 @@ export default function ApplicantLayout({ children }: { children: ReactNode }) {
 					<div className="hidden md:flex w-full items-center">
 						<div className="flex-1"></div>
 
-						<div className="flex-1 flex justify-center">
+						<div className="flex-1 flex justify-between">
 							{navLinks.map((link) => (
 								<Link
 									key={link.href}
@@ -70,10 +70,8 @@ export default function ApplicantLayout({ children }: { children: ReactNode }) {
 						</div>
 					</div>
 
-					<div className="md:hidden flex w-full justify-between items-center">
-						<span className="text-lg font-bold">
-							{navLinks.find((link) => pathname.includes(link.href))?.label || "Menu"}
-						</span>
+					{/* Mobile Navigation */}
+					<div className="md:hidden flex w-full justify-end items-center">
 						<BurgerMenu>
 							{isMounted && (
 								<>
