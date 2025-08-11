@@ -1,7 +1,5 @@
-import { getProfileData } from "@/utils/applicantUtils";
-import ApplicantLayoutClient from "@/app/components/applicant/ApplicantLayoutClient";
+"use client";
 
-<<<<<<< HEAD
 import BurgerMenu from "@/app/components/BurgerMenu";
 import Header from "@/app/components/Header";
 import { useGetProfileQuery } from "@/lib/redux/api/profileApiSlice";
@@ -132,13 +130,4 @@ export default function ApplicantLayout({ children }: { children: ReactNode }) {
 			</div>
 		</ProfileProvider>
 	);
-=======
-export default async function ApplicantLayout({ children }: { children: React.ReactNode }) {
-	// Fetch profile data on the server, same as dashboard
-	const profileResponse = await getProfileData();
-	const profileData = profileResponse?.success ? profileResponse.data : null;
-	const userName = profileData?.full_name || "Applicant";
-
-	return <ApplicantLayoutClient userName={userName}>{children}</ApplicantLayoutClient>;
->>>>>>> origin/feat/applicant-form
 }

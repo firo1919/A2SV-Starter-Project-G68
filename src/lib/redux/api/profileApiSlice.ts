@@ -1,11 +1,16 @@
 import { RouteHandlerResponse } from "@/types/RouteHandler";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ChangePassword, UpdateProfile } from "../types/profiles";
-
 export const profilesApi = createApi({
 	reducerPath: "profilesApi",
 	baseQuery: fetchBaseQuery({ baseUrl: "/api/profile/me/" }),
 	endpoints: (builder) => ({
+		getProfile: builder.query<RouteHandlerResponse, void>({
+			query: () => ({
+				url: "",
+				method: "GET",
+			}),
+		}),
 		updatePassword: builder.mutation<RouteHandlerResponse, ChangePassword>({
 			query: (data) => ({
 				url: "",
@@ -23,4 +28,4 @@ export const profilesApi = createApi({
 	}),
 });
 
-export const { useUpdatePasswordMutation, useUpdateProfileMutation } = profilesApi;
+export const { useGetProfileQuery, useUpdatePasswordMutation, useUpdateProfileMutation } = profilesApi;
