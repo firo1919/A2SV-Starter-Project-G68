@@ -29,8 +29,6 @@ export async function GET(): Promise<NextResponse<RouteHandlerResponse>> {
 			return NextResponse.json({ success: false, message: "Failed to fetch profile", data });
 		}
 
-
-
 		return NextResponse.json({ success: true, message: "Profile fetched successfully", data });
 	} catch (error) {
 		return NextResponse.json({ success: false, message: "Profile fetch error", data: null });
@@ -55,7 +53,11 @@ export async function PUT(req: NextRequest): Promise<NextResponse<RouteHandlerRe
 
 	if (!full_name && !email && !role) {
 		return NextResponse.json(
-			{ success: false, message: "Nothing to update (provide at least one of full_name, email, role)", data: null },
+			{
+				success: false,
+				message: "Nothing to update (provide at least one of full_name, email, role)",
+				data: null,
+			},
 			{ status: 400 }
 		);
 	}
@@ -81,11 +83,14 @@ export async function PUT(req: NextRequest): Promise<NextResponse<RouteHandlerRe
 		const data = await response.json();
 
 		if (!response.ok) {
-			return NextResponse.json({
-				success: false,
-				message: data?.message || "Failed to update profile",
-				data,
-			}, { status: response.status });
+			return NextResponse.json(
+				{
+					success: false,
+					message: data?.message || "Failed to update profile",
+					data,
+				},
+				{ status: response.status }
+			);
 		}
 
 		return NextResponse.json({ success: true, message: "Profile updated", data }, { status: 200 });
