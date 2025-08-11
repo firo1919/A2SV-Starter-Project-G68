@@ -1,20 +1,13 @@
 "use client";
 import React from "react";
-import { useGetApplicationStatusQuery } from "@/lib/redux/api/applicationsApiSlice";
 import { ApplicationStatus } from "@/types/ApplicationForm";
 
 interface CardProps {
 	type: "dashboard" | "progress";
+	applicationStatus?: ApplicationStatus | null;
 }
 
-export default function Card({ type }: CardProps) {
-	const { data: response } = useGetApplicationStatusQuery();
-
-	const applicationStatus: ApplicationStatus | null =
-		response?.success && response.data && typeof response.data === "object" && "data" in response.data
-			? (response.data.data as ApplicationStatus)
-			: null;
-
+export default function Card({ type, applicationStatus }: CardProps) {
 	// Helper function to format date
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleDateString("en-US", {
@@ -28,6 +21,71 @@ export default function Card({ type }: CardProps) {
 		type === "dashboard"
 			? "grid grid-cols-1 gap-3 sm:gap-4 justify-items-center w-full max-w-sm sm:max-w-md lg:max-w-[384px] mx-auto"
 			: "grid grid-cols-1 gap-4 sm:gap-6 justify-items-center w-full max-w-sm sm:max-w-md lg:max-w-[384px] mx-auto";
+
+	// Generate recent activities based on application status
+	const getRecentActivities = () => {
+		const activities = [];
+
+		// Always show application submitted
+		if (applicationStatus?.submitted_at) {
+			activities.push({
+				id: "submitted",
+				title: "Application Submitted",
+				date: applicationStatus.submitted_at,
+				icon: "/images/image.png",
+				alt: "Application Submitted",
+			});
+		}
+
+		// Show status-specific activities
+		if (applicationStatus?.status) {
+			const status = applicationStatus.status.toLowerCase();
+
+			if (status === "pending_review" || status === "under_review" || status === "in_progress") {
+				activities.push({
+					id: "review",
+					title: "Application Under Review",
+					date: applicationStatus.updated_at || applicationStatus.submitted_at,
+					icon: "/images/img2.png",
+					alt: "Under Review",
+				});
+			}
+
+			if (status === "interview" || status === "interview_scheduled") {
+				activities.push({
+					id: "interview",
+					title: "Interview Scheduled",
+					date: applicationStatus.updated_at || applicationStatus.submitted_at,
+					icon: "/images/img2.png",
+					alt: "Interview Scheduled",
+				});
+			}
+
+			if (status === "accepted") {
+				activities.push({
+					id: "accepted",
+					title: "Application Accepted",
+					date: applicationStatus.updated_at || applicationStatus.submitted_at,
+					icon: "/images/image.png",
+					alt: "Application Accepted",
+				});
+			}
+
+			if (status === "rejected") {
+				activities.push({
+					id: "rejected",
+					title: "Application Decision Made",
+					date: applicationStatus.updated_at || applicationStatus.submitted_at,
+					icon: "/images/img2.png",
+					alt: "Decision Made",
+				});
+			}
+		}
+
+		return activities;
+	};
+
+	const recentActivities = getRecentActivities();
 
 	return (
 		<div className="w-full px-2 sm:px-4 lg:px-0 flex justify-center">
@@ -103,46 +161,29 @@ export default function Card({ type }: CardProps) {
 								Recent Activity
 							</h1>
 							<div className="flex flex-col gap-3 sm:gap-4">
-								{applicationStatus && (
-									<div className="flex items-center gap-2 sm:gap-3">
-										<div className="rounded-full p-1 sm:p-2 flex items-center justify-center">
-											<img
-												src="/images/image.png"
-												alt="Application Submitted"
-												className="w-8 h-8 sm:w-10 sm:h-10"
-											/>
+								{recentActivities.length > 0 ? (
+									recentActivities.map((activity) => (
+										<div key={activity.id} className="flex items-center gap-2 sm:gap-3">
+											<div className="rounded-full p-1 sm:p-2 flex items-center justify-center">
+												<img
+													src={activity.icon}
+													alt={activity.alt}
+													className="w-8 h-8 sm:w-10 sm:h-10"
+												/>
+											</div>
+											<div>
+												<p className="text-sm sm:text-base font-semibold text-gray-700">
+													{activity.title}
+												</p>
+												<p className="text-xs sm:text-sm text-gray-400">
+													{formatDate(activity.date)}
+												</p>
+											</div>
 										</div>
-										<div>
-											<p className="text-sm sm:text-base font-semibold text-gray-700">
-												Application Submitted
-											</p>
-											<p className="text-xs sm:text-sm text-gray-400">
-												{applicationStatus.submitted_at
-													? formatDate(applicationStatus.submitted_at)
-													: "Date not available"}
-											</p>
-										</div>
-									</div>
-								)}
-								{applicationStatus && applicationStatus.status === "interview" && (
-									<div className="flex items-center gap-2 sm:gap-3">
-										<div className="rounded-full p-1 sm:p-2 flex">
-											<img
-												src="/images/img2.png"
-												alt="Interview Scheduled"
-												className="w-8 h-8 sm:w-10 sm:h-10"
-											/>
-										</div>
-										<div>
-											<p className="text-sm sm:text-base font-semibold text-gray-700">
-												Interview Scheduled
-											</p>
-											<p className="text-xs sm:text-sm text-gray-400">
-												{applicationStatus.updated_at
-													? formatDate(applicationStatus.updated_at)
-													: "Date not available"}
-											</p>
-										</div>
+									))
+								) : (
+									<div className="text-center py-4">
+										<p className="text-sm text-gray-500">No recent activity</p>
 									</div>
 								)}
 							</div>
@@ -150,20 +191,26 @@ export default function Card({ type }: CardProps) {
 						<div className="shadow-xl bg-white rounded-[8px] p-4 sm:p-6 lg:p-[24px] w-full">
 							<h1 className="text-base sm:text-lg font-semibold mb-2 text-center">Important Updates</h1>
 							<p className="text-xs sm:text-sm font-light text-center">
-								There are no new updates at this time. We will notify you by email when your application
-								status changes.
+								{applicationStatus?.status === "accepted"
+									? "Congratulations! Your application has been accepted. Welcome to A2SV!"
+									: "There are no new updates at this time. We will notify you by email when your application status changes."}
 							</p>
 						</div>
 						<div className="shadow-xl bg-[#4F46E5] rounded-[8px] p-4 sm:p-6 lg:p-[24px] w-full">
 							<h1 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-white text-center">
-								Get Ready for the Interview!
+								{applicationStatus?.status === "accepted"
+									? "Welcome to A2SV!"
+									: "Get Ready for the Interview!"}
 							</h1>
 							<h2 className="text-xs sm:text-sm font-bold text-white text-center">
-								While you wait, it's a great time to prepare. Practice your problem-solving skills on
-								platforms like LeetCode and Codeforces.
+								{applicationStatus?.status === "accepted"
+									? "You've been accepted into our program. We'll contact you soon with next steps and orientation details."
+									: "While you wait, it's a great time to prepare. Practice your problem-solving skills on platforms like LeetCode and Codeforces."}
 							</h2>
 							<p className="text-xs sm:text-sm font-bold text-white mt-2 text-center">
-								Read our interview prep guide →
+								{applicationStatus?.status === "accepted"
+									? "View orientation details →"
+									: "Read our interview prep guide →"}
 							</p>
 						</div>
 					</>
