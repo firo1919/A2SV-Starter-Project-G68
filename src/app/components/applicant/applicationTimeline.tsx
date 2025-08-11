@@ -1,5 +1,4 @@
 "use client";
-import { useGetApplicationStatusQuery } from "@/lib/redux/api/applicationsApiSlice";
 import { ApplicationStatus } from "@/types/ApplicationForm";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import React from "react";
@@ -29,36 +28,11 @@ const STAGES = [
 	},
 ];
 
-export default function ApplicationTimeline() {
-	const { data: response, isLoading, isError } = useGetApplicationStatusQuery();
+interface ApplicationTimelineProps {
+	applicationStatus?: ApplicationStatus | null;
+}
 
-	const applicationStatus: ApplicationStatus | null =
-		response?.success && response.data && typeof response.data === "object" && "data" in response.data
-			? (response.data.data as ApplicationStatus)
-			: null;
-
-	// Skeleton loader for when data is being fetched
-	if (isLoading) {
-		return (
-			<div className="p-3 bg-white shadow-xl rounded-md mx-auto w-full max-w-full sm:max-w-lg md:max-w-[800px] h-auto">
-				<h1 className="text-lg font-semibold mb-5">Application Timeline</h1>
-				<div className="flex items-center justify-center py-8">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-					<span className="ml-2 text-gray-600">Loading application status...</span>
-				</div>
-			</div>
-		);
-	}
-
-	if (isError || !response?.success) {
-		return (
-			<div className="bg-white p-6 rounded-lg shadow-md text-center">
-				<p className="text-red-500 font-semibold">Could not load application status.</p>
-				<p className="text-sm text-gray-500 mt-2">Please try again later.</p>
-			</div>
-		);
-	}
-
+export default function ApplicationTimeline({ applicationStatus }: ApplicationTimelineProps) {
 	if (!applicationStatus) {
 		return (
 			<div className="bg-white p-6 rounded-lg shadow-md">
@@ -78,28 +52,37 @@ export default function ApplicationTimeline() {
 			<h2 className="text-xl font-bold text-gray-800 mb-6">Application Timeline</h2>
 			<div>
 				{STAGES.map((stage, index) => {
-					// Your requested logic for determining stage status
-					const stageStatus =
-						{
-							submitted: 0,
-							under_review: 1,
-							in_progress: 1,
-							pending_review: 1,
-							interview: 2,
-							accepted: 3,
-							rejected: 3,
-						}[applicationStatus.status.toLowerCase()] || 0;
+					// Map backend status to timeline stage - more realistic mapping
+					const getCurrentStage = (status: string) => {
+						const statusLower = status.toLowerCase();
 
-					const currentStageIndex =
-						{
-							submitted: 0,
-							under_review: 1,
-							interview: 2,
-							decision: 3,
-						}[stage.id] || 0;
+						switch (statusLower) {
+							case "submitted":
+								return 0; // Submitted stage
+							case "pending_review":
+							case "under_review":
+							case "in_progress":
+								return 1; // Under Review stage
+							case "interview":
+							case "interview_scheduled":
+								return 2; // Interview stage
+							case "accepted":
+							case "rejected":
+								return 3; // Decision stage
+							default:
+								return 0; // Default to submitted
+						}
+					};
 
-					const isCompleted = currentStageIndex < stageStatus;
-					const isCurrent = currentStageIndex === stageStatus;
+					const currentApplicationStage = getCurrentStage(applicationStatus.status);
+					const currentStageIndex = index; // 0, 1, 2, 3
+
+					// More realistic logic:
+					// - Only show completed stages that come BEFORE the current stage
+					// - Show current stage as active
+					// - Show future stages as pending
+					const isCompleted = currentStageIndex < currentApplicationStage;
+					const isCurrent = currentStageIndex === currentApplicationStage;
 
 					// Determine the description based on the stage status
 					let description = stage.description;
@@ -110,6 +93,9 @@ export default function ApplicationTimeline() {
 							description = "Congratulations! Your application has been accepted. Welcome to A2SV!";
 						}
 					}
+
+					// Show submitted date for the submitted stage
+					const showSubmittedDate = stage.id === "submitted" && applicationStatus.submitted_at;
 
 					return (
 						<div key={stage.id} className="relative pb-8">
@@ -151,7 +137,7 @@ export default function ApplicationTimeline() {
 									<p className="text-sm text-gray-500 mt-1">
 										{isCurrent
 											? "Current Stage"
-											: isCompleted && stage.id === "submitted"
+											: showSubmittedDate
 											? formatDate(applicationStatus.submitted_at)
 											: ""}
 									</p>
