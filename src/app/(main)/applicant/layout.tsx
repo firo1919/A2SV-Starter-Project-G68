@@ -52,13 +52,16 @@ export default function ApplicantLayout({ children }: { children: ReactNode }) {
 							))}
 						</div>
 
-						<div className="flex-1 flex justify-end items-center gap-6">
+						<div className="flex-1 flex justify-end items-center gap-8">
 							{isMounted && (
 								<>
-									<Link href="/applicant/profile" className="text-sm font-semibold text-indigo-600">
+									<Link
+										href="/applicant/profile"
+										className="text-sm font-semibold text-indigo-600 whitespace-nowrap"
+									>
 										Your Profile
 									</Link>
-									<span className="text-sm text-gray-700">{userName}</span>
+									<span className="text-sm text-gray-700 whitespace-nowrap">{userName}</span>
 									<button
 										onClick={handleLogout}
 										className="text-sm font-medium text-gray-500 hover:text-gray-800"
@@ -90,7 +93,7 @@ export default function ApplicantLayout({ children }: { children: ReactNode }) {
 									<div className="flex flex-col gap-4 items-start">
 										<Link
 											href="/applicant/profile"
-											className="text-sm font-semibold text-indigo-600"
+											className="text-sm font-semibold text-indigo-600 whitespace-nowrap"
 										>
 											Your Profile
 										</Link>

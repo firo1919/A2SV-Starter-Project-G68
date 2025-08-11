@@ -12,6 +12,7 @@
 		"cypress:open": "cypress open"
 	},
 	"dependencies": {
+		"@heroicons/react": "^2.2.0",
 		"@hookform/devtools": "^4.4.0",
 		"@hookform/resolvers": "^5.2.1",
 		"@mui/icons-material": "^7.3.1",
