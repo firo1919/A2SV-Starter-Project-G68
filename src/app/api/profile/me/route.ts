@@ -39,9 +39,8 @@ export async function GET(): Promise<NextResponse<RouteHandlerResponse>> {
 
 export async function PUT(req: NextRequest): Promise<NextResponse<RouteHandlerResponse>> {
 	const session = await auth();
-
 	if (!session?.user?.accessToken) {
-		return NextResponse.json({ success: false, message: "Not authenticated", data: null });
+		return NextResponse.json({ success: false, message: "Not authenticated", data: null }, { status: 401 });
 	}
 
 	let body;
@@ -51,15 +50,24 @@ export async function PUT(req: NextRequest): Promise<NextResponse<RouteHandlerRe
 		return NextResponse.json({ success: false, message: "Invalid JSON body", data: null }, { status: 400 });
 	}
 
-	const { full_name, email } = body;
+	let { full_name, fullName, email, role } = body || {};
+	full_name = full_name || fullName;
 
-	if (!full_name || typeof full_name !== "string") {
-		return NextResponse.json({ success: false, message: "Missing or invalid full_name in body", data: null });
+	if (!full_name && !email && !role) {
+		return NextResponse.json(
+			{ success: false, message: "Nothing to update (provide at least one of full_name, email, role)", data: null },
+			{ status: 400 }
+		);
 	}
 
-	if (!email || typeof email !== "string") {
-		return NextResponse.json({ success: false, message: "Missing or invalid email in body", data: null });
+	if (!API_BASE) {
+		return NextResponse.json({ success: false, message: "API_BASE not configured", data: null }, { status: 500 });
 	}
+
+	const payload: Record<string, any> = {};
+	if (full_name) payload.full_name = full_name;
+	if (email) payload.email = email;
+	if (role) payload.role = role;
 
 	try {
 		const response = await fetch(`${API_BASE}/profile/me`, {
@@ -68,18 +76,21 @@ export async function PUT(req: NextRequest): Promise<NextResponse<RouteHandlerRe
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${session.user.accessToken}`,
 			},
-			body: JSON.stringify({ full_name, email }),
+			body: JSON.stringify(payload),
 		});
-
 		const data = await response.json();
 
 		if (!response.ok) {
-			return NextResponse.json({ success: false, message: data?.message || "Failed to update profile", data });
+			return NextResponse.json({
+				success: false,
+				message: data?.message || "Failed to update profile",
+				data,
+			}, { status: response.status });
 		}
 
-		return NextResponse.json({ success: true, message: "", data }, { status: 200 });
+		return NextResponse.json({ success: true, message: "Profile updated", data }, { status: 200 });
 	} catch (error) {
-		console.error("PUT /profile/me error:", error);
+		console.error("PUT /api/profile/me error:", error);
 		return NextResponse.json({ success: false, message: "Something went wrong", data: null }, { status: 500 });
 	}
 }
