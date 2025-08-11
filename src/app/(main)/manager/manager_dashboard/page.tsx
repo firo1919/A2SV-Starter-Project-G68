@@ -1,57 +1,88 @@
-// app/manager/manager_dashboard/page.tsx
+
 import type { NextPage } from 'next';
 import { auth } from '@/auth';
 import ManagerDashboardClient from '@/app/components/manager/ManagerDashboardClient';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-// --- DATA FETCHING (Runs on the server) ---
+const API_BASE = process.env.API_BASE
+
+
+export type ApplicationStatusAPI = 'in_progress' | 'accepted' | 'rejected' | 'new';
+export interface ApplicationSummary { id: string; applicant_name: string; status: ApplicationStatusAPI; assigned_reviewer_name: string | null; }
+export interface AvailableReviewer { id: string; full_name: string; email: string; }
+export interface TeamMemberPerformance { name: string; assignedCount: number; }
+
+
+
 async function fetchData() {
   const session = await auth();
   const token = session?.user?.accessToken;
 
-  if (!token) {
-    throw new Error('Not authenticated. No access token found.');
-  }
+  if (!token) { throw new Error('Not authenticated. No access token found.'); }
 
   const headers = { 'Authorization': `Bearer ${token}` };
-  const config = { headers, next: { revalidate: 60 } }; // Cache for 60 seconds
+  const config = { headers, next: { revalidate: 60 } };
 
-  // Fetch applications and reviewers in parallel for better performance
-  const [applicationsRes, reviewersRes] = await Promise.all([
-    fetch(`${process.env.API_BASE}/manager/applications/`, config),
-    fetch(`${process.env.API_BASE}/manager/applications/available-reviewers`, config)
+
+  const [applicationsRes, reviewersRes, assignedReviewsRes] = await Promise.all([
+    fetch(`${API_BASE}/manager/applications/`, config),
+    fetch(`${API_BASE}/manager/applications/available-reviewers`, config),
+    fetch(`${API_BASE}/reviews/assigned`, config) 
   ]);
 
   if (!applicationsRes.ok) throw new Error('Failed to fetch applications');
   if (!reviewersRes.ok) throw new Error('Failed to fetch available reviewers');
 
-
+  
   const applicationsData = await applicationsRes.json();
   const reviewersData = await reviewersRes.json();
+  
+  
+  if (assignedReviewsRes.ok) {
+    const assignedReviewsData = await assignedReviewsRes.json();
+    console.log(" RESULT: GET /reviews/assigned ---");
+    console.log(JSON.stringify(assignedReviewsData, null, 2));
+  } else {
+    console.log(" RESULT: GET /reviews/assigned ---");
+    console.log(`Failed with status: ${assignedReviewsRes.status} ${assignedReviewsRes.statusText}`);
+  }
 
   return {
-    applications: applicationsData.data.applications,
-    reviewers: reviewersData.data.reviewers
+    applications: applicationsData.data.applications as ApplicationSummary[],
+    reviewers: reviewersData.data.reviewers as AvailableReviewer[]
   };
 }
 
-// --- MAIN PAGE COMPONENT (Server Component) ---
+
+
 const ManagerDashboardPage: NextPage = async () => {
   try {
     const { applications, reviewers } = await fetchData();
 
-    // Calculate stats from the fetched data
-    const totalApplications = applications.length;
-    const underReview = applications.filter((app: any) => app.status === 'in_progress').length;
-    const accepted = applications.filter((app: any) => app.status === 'accepted').length;
-    const stats = { totalApplications, underReview, accepted, interviewStage: 250 }; // interviewStage is static
+    const stats = {
+      totalApplications: applications.length,
+      underReview: applications.filter(app => app.status === 'in_progress').length,
+      accepted: applications.filter(app => app.status === 'accepted').length,
+      interviewStage: 250,
+    };
 
-    // Render the Client Component and pass the fetched data and stats as props
+    
+    const performanceMap = new Map<string, number>();
+    for (const app of applications) {
+      if (app.assigned_reviewer_name) {
+        const currentCount = performanceMap.get(app.assigned_reviewer_name) || 0;
+        performanceMap.set(app.assigned_reviewer_name, currentCount + 1);
+      }
+    }
+    const teamPerformance: TeamMemberPerformance[] = Array.from(performanceMap.entries()).map(
+      ([name, assignedCount]) => ({ name, assignedCount })
+    );
+
     return (
       <ManagerDashboardClient
         applications={applications}
         reviewers={reviewers}
         stats={stats}
+        teamPerformance={teamPerformance}
       />
     );
   } catch (error) {

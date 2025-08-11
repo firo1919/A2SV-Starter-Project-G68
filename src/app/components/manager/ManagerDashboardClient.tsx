@@ -1,4 +1,3 @@
-// components/manager/ManagerDashboardClient.tsx
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
@@ -7,28 +6,30 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaUser } from 'react-icons/fa';
 import { IoChevronDown, IoChevronForward } from 'react-icons/io5';
-import { useAssignReviewerMutation } from '@/lib/redux/api/managerApiSlice';
-
-// 1. IMPORT the RTK Query hook you created.
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// --- TYPE DEFINITIONS ---
-type ApplicationStatusAPI = 'in_progress' | 'accepted' | 'rejected' | 'new';
-interface ApplicationSummary { id: string; applicant_name: string; status: ApplicationStatusAPI; assigned_reviewer_name: string | null; }
-interface AvailableReviewer { id: string; full_name: string; email: string; }
-interface DashboardStats { totalApplications: number; underReview: number; accepted: number; interviewStage: number; }
-interface ManagerDashboardClientProps { applications: ApplicationSummary[]; reviewers: AvailableReviewer[]; stats: DashboardStats; }
 
-// --- HELPER COMPONENTS ---
+import type { ApplicationSummary, AvailableReviewer, TeamMemberPerformance, ApplicationStatusAPI } from '@/app/(main)/manager/manager_dashboard/page';
+import { useAssignReviewerMutation } from '@/lib/redux/api/managerApiSlice';
+
+interface DashboardStats { totalApplications: number; underReview: number; accepted: number; interviewStage: number; }
+
+
+interface ManagerDashboardClientProps { 
+    applications: ApplicationSummary[]; 
+    reviewers: AvailableReviewer[]; 
+    stats: DashboardStats; 
+    teamPerformance: TeamMemberPerformance[];
+}
+
+
 const StatusBadge = ({ status }: { status: ApplicationStatusAPI }) => {
   const baseClasses = 'px-2.5 py-0.5 text-xs font-medium rounded-full inline-block capitalize';
   const statusClasses: Record<ApplicationStatusAPI, string> = { 'in_progress': 'bg-yellow-100 text-yellow-800', 'new': 'bg-blue-100 text-blue-600', 'accepted': 'bg-green-100 text-green-800', 'rejected': 'bg-red-100 text-red-800' };
   return <span className={`${baseClasses} ${statusClasses[status]}`}>{status.replace('_', ' ')}</span>;
 };
-const teamPerformance = [{ name: 'Jane R.', assigned: 3, avgTime: '2.5 days', totalReviews: 12 }, { name: 'Mike R.', assigned: 5, avgTime: '3.1 days', totalReviews: 8 }];
 
-// --- CUSTOM HOOK FOR RESPONSIVENESS ---
+
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
   useEffect(() => {
@@ -41,7 +42,7 @@ const useMediaQuery = (query: string) => {
   return matches;
 };
 
-// === RESPONSIVE PORTAL DROPDOWN COMPONENT ===
+
 const DropdownPortal = ({ children, targetRect, onClose, isMobile }: { children: React.ReactNode; targetRect: DOMRect; onClose: () => void; isMobile: boolean }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const positionStyles = isMobile ? {
@@ -57,16 +58,13 @@ const DropdownPortal = ({ children, targetRect, onClose, isMobile }: { children:
   return createPortal(<div ref={menuRef} style={positionStyles} className="w-48 bg-white rounded-md shadow-lg z-50 border border-gray-100">{children}</div>, document.body);
 };
 
-// --- MAIN CLIENT COMPONENT ---
-export default function ManagerDashboardClient({ applications, reviewers, stats }: ManagerDashboardClientProps) {
+
+export default function ManagerDashboardClient({ applications, reviewers, stats, teamPerformance }: ManagerDashboardClientProps) {
   const router = useRouter();
   const [openMenu, setOpenMenu] = useState<{ id: string; rect: DOMRect } | null>(null);
   const [isAssignMenuOpen, setIsAssignMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // 2. USE the mutation hook. 'isLoading' replaces the need for a manual `isSubmitting` state.
   const [assignReviewer, { isLoading: isSubmitting }] = useAssignReviewerMutation();
-
   const [activeFilter, setActiveFilter] = useState<ApplicationStatusAPI | 'All'>('All');
   const isMobile = useMediaQuery('(max-width: 768px)');
   const uniqueStatuses = [...new Set(applications.map(app => app.status))];
@@ -76,37 +74,31 @@ export default function ManagerDashboardClient({ applications, reviewers, stats 
   const handleToggleMenu = (appId: string, event: React.MouseEvent<HTMLButtonElement>) => {
     if (openMenu?.id === appId) {
       setOpenMenu(null);
-      setIsAssignMenuOpen(false); // Close nested menu as well
+      setIsAssignMenuOpen(false);
     } else {
       const rect = event.currentTarget.getBoundingClientRect();
       setOpenMenu({ id: appId, rect });
-      setIsAssignMenuOpen(false); // Ensure nested menu is closed on new open
+      setIsAssignMenuOpen(false);
     }
   };
   const handleCloseAllMenus = () => {
     setOpenMenu(null);
     setIsAssignMenuOpen(false);
   };
-
-  // 3. UPDATE the handler function to use the RTK Query trigger.
   const handleAssignReviewer = async (applicationId: string, reviewerId: string) => {
     if (isSubmitting) return;
-
     try {
-      // Your slice expects an object with 'id' (for the URL) and 'reviewer' (for the body).
-      // Let's assume your `AssignedReviewer` type is { reviewer_id: string }
       await assignReviewer({
         id: applicationId,
         reviewer: { reviewer_id: reviewerId }
-      }).unwrap(); // .unwrap() will throw an error if the mutation fails.
-
+      }).unwrap();
       alert('Reviewer assigned successfully!');
       handleCloseAllMenus();
-      router.refresh(); // Re-fetch server data and re-render the page with the update.
-    } catch (error: any) {
+      router.refresh();
+    } catch (error:any) {
       console.error("Failed to assign reviewer:", error);
-      // Display a more specific error message from the API if available.
-      alert(`Error: ${error.data?.message || 'An unexpected error occurred.'}`);
+      const errorMessage = error.data?.message || 'An unexpected error occurred. Please check the console.';
+      alert(`Error: ${errorMessage}`);
     }
   };
 
@@ -158,10 +150,35 @@ export default function ManagerDashboardClient({ applications, reviewers, stats 
                 {filteredApplications.length === 0 && (<div className="w-full text-center py-6 text-gray-500">No applications match this filter.</div>)}
               </div>
             </div>
+            
+            
+
             <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-lg h-fit">
               <h2 className="text-xl font-bold text-gray-800 font-poppins mb-4">Team Performance</h2>
               <div className="space-y-5">
-                {teamPerformance.map((member, index) => (<div key={index} className="flex justify-between items-start"><div><p className="font-semibold text-gray-900">{member.name}</p><p className="text-sm text-gray-500">{`${member.assigned} Assigned / Avg. ${member.avgTime}`}</p></div><p className="text-sm font-medium text-gray-600 whitespace-nowrap">{`${member.totalReviews} Reviews`}</p></div>))}
+                {teamPerformance.map((member) => (
+                  <div key={member.name} className="flex justify-between items-start">
+                    <div>
+                      <p className="font-semibold text-gray-900">{member.name}</p>
+                      <p className="text-sm text-gray-500">
+
+
+                        {member.assignedCount} Assigned
+
+
+                        <span className="text-gray-400"> / Avg. 2.5 days</span>
+                      </p>
+                    </div>
+
+                    <p className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                      {/* 12 Reviews */}
+                      {member.assignedCount} Reviews
+                    </p>
+                  </div>
+                ))}
+                {teamPerformance.length === 0 && (
+                  <p className="text-sm text-gray-500">No reviewers currently have assigned applications.</p>
+                )}
               </div>
             </div>
           </div>
@@ -171,7 +188,7 @@ export default function ManagerDashboardClient({ applications, reviewers, stats 
       {openMenu && (
         <DropdownPortal targetRect={openMenu.rect} onClose={handleCloseAllMenus} isMobile={isMobile}>
           <div className="py-1">
-            <Link href={`/manager/manage/${openMenu.id}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left">View Details</Link>
+            <Link href={`/manager/manager_details/${openMenu.id}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left">View Details</Link>
             <div className="relative">
               <button onClick={() => setIsAssignMenuOpen(!isAssignMenuOpen)} className="w-full text-left flex justify-between items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">
                 Assign to Reviewer <IoChevronForward className="w-4 h-4" />
