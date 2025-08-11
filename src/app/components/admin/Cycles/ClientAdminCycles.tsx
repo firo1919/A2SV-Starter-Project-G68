@@ -2,8 +2,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import CyclesCard from '@/app/components/admin/CyclesCard'
-import CyclesButton from '@/app/components/admin/CyclesButton'
+import CyclesCard from '@/app/components/admin/Cycles/CyclesCard'
+import CyclesButton from '@/app/components/admin/Cycles/CyclesButton'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { CycleType } from '@/types/AdminTypes'

@@ -1,6 +1,6 @@
 //utils/adminUtils.ts
 import { auth } from "@/auth";
-import { AnalyticsResponseType, CycleResponseType, UsersResponseType } from "@/types/AdminTypes";
+import { ActiveCyclesResponse, AnalyticsResponseType, CycleResponseType, UsersResponseType } from "@/types/AdminTypes";
 
 const baseUrl = process.env.API_BASE;
 
@@ -105,4 +105,23 @@ export async function getAnalysisData(): Promise<AnalyticsResponseType | null> {
     console.error("Failed to fetch data:", error);
     return null;
   }  
+}
+
+export async function getActiveCyclesData(): Promise<ActiveCyclesResponse | null> {
+  const url = `${baseUrl}/cycles/active`
+
+  try {
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data: ActiveCyclesResponse = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch data:", error);
+    return null;
+  }
 }

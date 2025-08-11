@@ -1,22 +1,48 @@
 'use client'
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { DevTool } from "@hookform/devtools"
 import { useUpdateUserMutation } from '@/lib/redux/api/adminApiSlice'
 import { EditUser, userSchema } from '@/lib/zod/admin/UpdateUser'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'react-toastify'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { boolean } from 'zod'
+import { UsersType } from '@/types/AdminTypes'
+import { ImSpinner } from 'react-icons/im'
 
 
-const EditNewUserForm = () => {
+interface EditUsersProps {
+    users: UsersType[],
+    onUserNameFound?: (name: string) => void;
+}
+
+const EditNewUserForm = ({users, onUserNameFound}: EditUsersProps) => {
     const [updateUser, {isLoading, error}] = useUpdateUserMutation()
     const form = useForm<EditUser>({ resolver: zodResolver(userSchema) });
     const { register, control, handleSubmit, formState, reset } = form;
     const { errors, isSubmitting, isSubmitted, isSubmitSuccessful } = formState;
     const searchParams = useSearchParams();
     const userId = searchParams.get('id');
+    const router = useRouter()
+
+    const user = Array.isArray(users) ? users.find((u) => u.id === userId) : users;
+
+    useEffect(() => {
+    if (user) {
+        reset({
+        full_name: user.full_name,
+        email: user.email,
+        role: user.role,
+        is_active: user.is_active ? "true" : "false"
+        });
+    }
+    }, [user, reset]);
+
+        useEffect(() => {
+        if (user) {
+        onUserNameFound?.(user.full_name);
+        }
+    }, [user, onUserNameFound]);
 
 
     if (errors) {
@@ -52,7 +78,7 @@ const EditNewUserForm = () => {
             theme: "colored",
             hideProgressBar: true,
             });
-
+            router.push('/admin/users')
             reset();
         } catch (error) {
             toast.error("User update failed", {
@@ -67,7 +93,7 @@ const EditNewUserForm = () => {
 
 
   return (
-    <div className='w-full flex flex-col items-center mb-16 md:mb-30'>
+    <div className='relative w-full flex flex-col items-center mb-16 md:mb-30'>
         <form className='flex flex-col p-4 w-full' onSubmit={handleSubmit(submitFunc)} noValidate>
             <div className='grid grid-cols-1 md:grid-cols-2 w-full bg-white gap-2 p-6  rounded-t-2xl'>
                 <div className='flex flex-col gap-1'>
@@ -110,7 +136,11 @@ const EditNewUserForm = () => {
                 <button type='submit' className='text-white bg-[#4F46E5] rounded py-2 px-4'>Update User</button>
             </div>
         </form>
-        <DevTool control={control}/>
+        {isLoading && (
+            <div className="absolute top-0 w-full h-full bg-athens-gray opacity-50 flex items-center justify-center">
+                <ImSpinner className="text-7xl animate-spin" />
+            </div>
+        )}
     </div>
   )
 }
