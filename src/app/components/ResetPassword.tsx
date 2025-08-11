@@ -33,7 +33,7 @@ function ResetPassword({ token }: Props) {
 				throw response.data?.message;
 			}
 			toast("Successfull", { draggable: false, theme: "colored", hideProgressBar: true, type: "success" });
-			router.push("/login");
+			router.push("/successfull-reset");
 		} catch (error) {
 			toast("Failed", { draggable: false, theme: "colored", hideProgressBar: true, type: "error" });
 			console.log(error);
