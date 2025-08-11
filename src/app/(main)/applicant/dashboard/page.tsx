@@ -1,9 +1,8 @@
 "use client";
-import React from "react";
+import BurgerMenu from "@/app/components/BurgerMenu";
+import { useRouter } from "next/navigation";
 import Card from "../../../components/applicant/card";
 import Header from "../../../components/Header";
-import { useRouter } from "next/navigation";
-import BurgerMenu from "@/app/components/BurgerMenu";
 interface DashboardProps {
 	onStartApplication: () => void;
 }
