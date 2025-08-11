@@ -18,6 +18,11 @@ export const personalInfoSchema = z.object({
 		.min(1, "Degree Program is required")
 		.min(2, "Degree Program must be at least 2 characters")
 		.max(100, "Degree Program must be less than 100 characters"),
+	country: z
+		.string()
+		.min(1, "Country is required")
+		.min(2, "Country must be at least 2 characters")
+		.max(50, "Country must be less than 50 characters"),
 });
 
 // Coding Profiles Schema
@@ -37,14 +42,6 @@ export const codingProfilesSchema = z.object({
 		.regex(
 			/^https:\/\/leetcode\.com\/[a-zA-Z0-9_-]+\/?$/,
 			"Enter a valid LeetCode profile URL (e.g., https://leetcode.com/your_handle)"
-		),
-	github: z
-		.string()
-		.trim()
-		.min(1, "GitHub profile link is required")
-		.regex(
-			/^https:\/\/github\.com\/[a-zA-Z0-9_-]+\/?$/,
-			"Enter a valid GitHub profile URL (e.g., https://github.com/your_handle)"
 		),
 });
 
