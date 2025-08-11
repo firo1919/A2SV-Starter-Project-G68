@@ -38,9 +38,7 @@ export default function Dashboard() {
 	return (
 		<main className="flex-grow flex flex-col items-center justify-start pt-6 sm:pt-8 lg:pt-10">
 			<div className="w-full max-w-6xl px-4 sm:px-6">
-				{/* Use a 3-column grid on large screens and reduce the gap */}
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-4 items-start justify-center">
-					{/* Make the left column span 2 of the 3 grid columns */}
 					<div className="order-1 lg:order-1 lg:col-span-2">
 						<h1 className="text-xl sm:text-2xl font-semibold mb-2">Welcome, {userName.split(" ")[0]}!</h1>
 						<p className="text-sm text-gray-600 mb-4 sm:mb-6">
