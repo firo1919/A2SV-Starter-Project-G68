@@ -7,14 +7,17 @@ import SignOut from "../components/SignOut";
 
 async function PublicLayout({ children }: Readonly<{ children: ReactNode }>) {
 	const navlinks = [
-		{ href: "#", label: "The Journey" },
-		{ href: "#", label: "About" },
-		{ href: "#", label: "Testimonials" },
+		{ href: "#thejourney", label: "The Journey" },
+		{ href: "#about", label: "About" },
+		{ href: "#testimonials", label: "Testimonials" },
 	];
 	const session = await auth();
 	return (
 		<>
 			<Header>
+
+
+				
 				<div className="hidden md:flex items-center">
 					{navlinks.map((link) => (
 						<Link

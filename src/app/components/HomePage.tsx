@@ -19,8 +19,9 @@ const HomePage = () => {
             Forge Your Future in Tech
           </h1>
           <p className="text-white/90 text-sm md:text-base lg:text-lg mb-6 max-w-2xl">
-            Join Africa&apos;s most intensive software engineering program and land your dream job at top global tech companies
-          </p>
+            Join an elite community of Africa&apos;s brightest minds, and get fast-tracked to a
+            software engineering career at the world&apos;s leading tech companies.          
+            </p>
           <Link href="/login">
             <button className="bg-indigo-800 cursor-pointer hover:bg-indigo-900 text-white px-6 py-3 md:px-8 md:py-4 rounded-md font-semibold transition-colors">
               Start Your Application
@@ -29,12 +30,12 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="flex gap-6 md:gap-10 justify-center mb-5 px-4 mt-4">
-        <Image src="/images/google.png" alt='Google-Image' width={130} height={60} className="md:w-[150px] md:h-[70px] mr-60" />
-        <Image src="/images/amazon.png" alt='Amazon-Image' width={130} height={60} className="md:w-[150px] md:h-[70px] mr-60" />
+      <div className="flex gap-3 md:gap-10 justify-center mb-6 px-4 mt-7">
+        <Image src="/images/google.png" alt='Google-Image' width={170} height={60} className="md:w-[200px] md:h-[50px] mr-15" />
+        <Image src="/images/amazon.png" alt='Amazon-Image' width={170} height={60} className="md:w-[200px] md:h-[50px] mr-15"/>
       </div>
 
-      <div className="bg-white w-full py-10 md:py-20 px-4 md:px-8 lg:px-60">
+      <div id="thejourney" className="bg-white w-full py-10 md:py-20 px-4 md:px-8 lg:px-60">
         <h1 className='font-bold ml-50 text-2xl md:text-3xl text-center md:text-left mb-3 text-black'>Your Journey to Silicon Valley</h1>
         <p className="text-center ml-60 md:text-left mb-6 text-gray-500 text-sm md:text-base">A proven path from learning to leadership</p>
         
@@ -74,7 +75,7 @@ const HomePage = () => {
       </div>
 
 
-      <div className="flex flex-col lg:flex-row gap-5 mb-15 px-4 md:px-8 lg:px-12 py-10">
+      <div id="about" className="flex flex-col lg:flex-row gap-5 mb-15 px-4 md:px-8 lg:px-12 py-10" >
         <div className="lg:ml-50 lg:mt-40 lg:w-130 lg:mr-7 mb-10 lg:mb-20">
           <h1 className="text-black font-bold text-xl md:text-2xl mb-4">Built by Engineers, for Engineers</h1>
           <p className="text-gray-500 text-sm md:text-base">A2SV is not just a program, it&apos;s a community. We&apos;re on a mission to identify Africa&apos;s most brilliant minds and provide them with the tools to solve humanity&apos;s greatest challenges.</p>
@@ -85,8 +86,8 @@ const HomePage = () => {
       </div>
 
 
-      <div className="bg-white/70 w-full py-10 md:py-20 px-4 md:px-8 lg:px-50">
-        <h1 className="text-black font-bold text-xl md:text-2xl text-center mb-6">Hear from our Alumni</h1>
+      <div id="testimonials" className="bg-white/70 w-full py-10 md:py-20 px-4 md:px-8 lg:px-50">
+        <h1 className="text-black font-bold text-xl md:text-2xl text-center mb-6">Hear from Our Alumni</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white text-sm py-7 px-7 rounded-lg shadow-sm">
             <p className='text-black/80 mb-5'>&quot;A2SV completely changed the trajectory of my career. The training is intense, but the community and the opportunities are unparalleled. I&apos;m now at my dream company, and I owe it all to A2SV.&quot;</p>
