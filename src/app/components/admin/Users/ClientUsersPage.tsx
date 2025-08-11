@@ -3,10 +3,12 @@
 import { UsersType } from '@/types/AdminTypes'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import UserCard from './UserCard'
 import UsersButton from './UsersButton'
 import { useDeleteUserMutation } from '@/lib/redux/api/adminApiSlice'
+import { RiSearchLine } from 'react-icons/ri';
+import Search from './Search'
 
 interface AdminUsersPageTypes {
     initialUsers: UsersType[],
@@ -14,7 +16,40 @@ interface AdminUsersPageTypes {
 }
 
 const ClientUsersPage = ({initialUsers, total_count}: AdminUsersPageTypes) => {
-  const [users, setUsers] = useState(initialUsers)
+
+    //Search Search Search Search Search
+
+    const [results, setResults] = useState<UsersType[]>([]);
+    const [data, setData] = useState<UsersType[]>([]);
+    const [users, setUsers] = useState<UsersType[]>(initialUsers);
+
+    const handleSearch = (query: string, role: string = 'All Roles') => {
+        if (!query && role === 'All Roles') {
+            setUsers(initialUsers); // reset if nothing to filter
+            return;
+        }
+
+        const filteredResults = initialUsers.filter(item => {
+            const matchesName = query.trim()
+            ? item.full_name.toLowerCase().includes(query.toLowerCase())
+            : true; // skip if no query
+
+            const matchesRole = role !== 'All Roles'
+            ? item.role.toLowerCase() === role.toLowerCase()
+            : true; // skip if all roles
+
+            return matchesName && matchesRole;
+        });
+
+        setUsers(filteredResults);
+    };
+
+
+
+
+     //Search Search Search Search Search
+
+  
   const [currentPage, setCurrentPage] = useState(1)
   const [deleteUser, {error, isLoading}] = useDeleteUserMutation();
   const itemPerPage = 5
@@ -25,7 +60,7 @@ const ClientUsersPage = ({initialUsers, total_count}: AdminUsersPageTypes) => {
   const thisPageItems = users.slice(firstItemIndex, lastItemIndex)    
 
     const handleDelete = async (id: string) => {
-        console.log("handleDelete called with ID:", id); // <== ADD THIS
+        console.log("handleDelete called with ID:", id);
         try {
             const result = await deleteUser({ id:id }).unwrap();
             console.log("User deleted:", result);
@@ -45,21 +80,21 @@ const ClientUsersPage = ({initialUsers, total_count}: AdminUsersPageTypes) => {
             </div>
             <UsersButton />
         </div>
-        <div className='flex w-9/10 md:w-98% md:w-[1240px] mx-auto bg-white p-2 rounded gap-3 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.09)]'>
-            <input className='w-9/10 p-3 rounded border-[#E5E7EB] border-2' type="text" placeholder='Search users by name or email...'/>
-            <button className='bg-[#E0E7FF] p-3 rounded border-[#E5E7EB] border-2'>All Roles</button>
+        <div>
+            <Search onSearch={handleSearch} />
         </div>
         <div className='flex flex-col w-9/10 md:w-[1240px] mx-auto'>
-            <div className='flex justify-between w-full bg-[#F9FAFB] p-4'>
-                <h1>NAME</h1>
+            <div className='hidden md:flex justify-start w-full bg-[#F9FAFB] p-4 md:gap-55'>
+                <h1 className='mr-25'>NAME</h1>
                 <h2>ROLE</h2>
                 <h2>STATUS</h2>
-                <h2></h2>
             </div>
-            {thisPageItems.map((user) => (
-                    <UserCard key={user.id} id={user.id} profile={user.profile_picture} username={user.full_name} user_email={user.email} role={user.role} status={user.is_active} onDelete={handleDelete} />
-                )
-            )}
+            <div className='flex flex-col gap-3 md:gap-0 items-center'>
+                {thisPageItems.map((user) => (
+                        <UserCard key={user.id} id={user.id} profile={user.profile_picture} username={user.full_name} user_email={user.email} role={user.role} status={user.is_active} onDelete={handleDelete} />
+                    )
+                )}
+            </div>
         </div>
         <div className="flex justify-between items-center w-9/10 md:w-[1240px] mt-4 md:mt-10 mb-4 md:mb-25">
             <p>

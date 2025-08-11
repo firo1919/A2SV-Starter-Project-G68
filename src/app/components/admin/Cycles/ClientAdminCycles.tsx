@@ -7,6 +7,8 @@ import CyclesButton from '@/app/components/admin/Cycles/CyclesButton'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { CycleType } from '@/types/AdminTypes'
+import { useActivateCycleMutation, useDeleteCycleMutation } from '@/lib/redux/api/adminApiSlice'
+import { number } from 'zod'
 
 const cycleType = {
   title: 'G7 registration',
@@ -21,7 +23,10 @@ interface AdminCyclesPageTypes {
 }
 
 const AdminCyclesClient = ({ initialCycles, total_count }: AdminCyclesPageTypes) => {
-  const [cycles] = useState(initialCycles)
+  const [deleteCycle, {isLoading, error}] = useDeleteCycleMutation()
+  const [activate] = useActivateCycleMutation();
+// const [deactivate] = useDeactivateCycleMutation();
+  const [cycles, setCycles] = useState(initialCycles)
   const [currentPage, setCurrentPage] = useState(1)
   const itemPerPage = 4
 
@@ -29,6 +34,51 @@ const AdminCyclesClient = ({ initialCycles, total_count }: AdminCyclesPageTypes)
   const firstItemIndex = (currentPage - 1) * itemPerPage
   const lastItemIndex = currentPage * itemPerPage
   const thisPageItems = cycles.slice(firstItemIndex, lastItemIndex)
+
+  const handleDelete = async (id: number) => {
+      console.log("handleDelete called with ID:", id);
+      try {
+          const result = await deleteCycle({ id }).unwrap();
+          console.log("Cycle deleted:", result);
+          setCycles((prev) => prev.filter((cycle) => cycle.id !== id));
+      } catch (err) {
+          console.error("Delete failed", err);
+          alert("Failed to delete cycle");
+      }
+  };
+
+const handleActivate = async (id: number) => {
+  try {
+    const result = await activate({ id: String(id) }).unwrap();
+    console.log("Cycle activated:", result);
+
+    setCycles((prev) =>
+      prev.map((cycle) =>
+        cycle.id === id ? { ...cycle, is_active: true } : cycle
+      )
+    );
+  } catch (err) {
+    console.error("Activation failed", err);
+    alert("Failed to activate cycle");
+  }
+};
+
+const handleDeactivate = async (id: number) => {
+  try {
+    // Once you add deactivate mutation:
+    // const result = await deactivate({ id: String(id) }).unwrap();
+    console.log("Cycle deactivated:", id);
+
+    setCycles((prev) =>
+      prev.map((cycle) =>
+        cycle.id === id ? { ...cycle, is_active: false } : cycle
+      )
+    );
+  } catch (err) {
+    console.error("Deactivation failed", err);
+    alert("Failed to deactivate cycle");
+  }
+};
 
   return (
     <div className="flex flex-col items-center">
@@ -40,10 +90,14 @@ const AdminCyclesClient = ({ initialCycles, total_count }: AdminCyclesPageTypes)
         {thisPageItems.map((cycle) => (
           <CyclesCard
             key={cycle.id}
+            id={cycle.id}
             title={cycle.name}
             content={cycleType.content}
             country={cycleType.country}
             status={cycle.is_active}
+            onDelete={handleDelete}
+            onActivate={handleActivate}
+            onDeactivate={handleDeactivate}
           />
         ))}
       </div>
