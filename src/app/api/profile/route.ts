@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE = process.env.API_BASE;
 
-<<<<<<< HEAD:src/app/api/profile/me/route.ts
 export async function GET(): Promise<NextResponse<RouteHandlerResponse>> {
 	const session = await auth();
 
@@ -36,8 +35,6 @@ export async function GET(): Promise<NextResponse<RouteHandlerResponse>> {
 	}
 }
 
-=======
->>>>>>> origin/feat/applicant-form:src/app/api/profile/route.ts
 export async function PUT(req: NextRequest): Promise<NextResponse<RouteHandlerResponse>> {
 	const session = await auth();
 	if (!session?.user?.accessToken) {
