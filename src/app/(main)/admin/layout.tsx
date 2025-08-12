@@ -1,12 +1,18 @@
 import Header from "@/app/components/Header";
 import { getProfileData } from "@/utils/profileUtils";
+import React from "react";
 
-async function ReviewersLayout({
+async function AdminLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const navlinks = [{ href: "/manager/dashboard", label: "Dashboard" }];
+	const navlinks = [
+		{ href: "/admin/dashboard", label: "Dashboard" },
+		{ href: "/admin/users", label: "Users" },
+		{ href: "/admin/cycles", label: "Cycles" },
+		{ href: "/admin/analytics", label: "Analytics" },
+	];
 	const user = await getProfileData();
 	return (
 		<>
@@ -15,4 +21,5 @@ async function ReviewersLayout({
 		</>
 	);
 }
-export default ReviewersLayout;
+
+export default AdminLayout;

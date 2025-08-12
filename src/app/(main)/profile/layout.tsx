@@ -1,9 +1,9 @@
+import Header from "@/app/components/Header";
 import { auth } from "@/auth";
 import { getProfileData } from "@/utils/profileUtils";
 import { ReactNode } from "react";
-import Header from "../components/Header";
 
-async function PublicLayout({ children }: Readonly<{ children: ReactNode }>) {
+async function ProfileLayout({ children }: Readonly<{ children: ReactNode }>) {
 	const navlinks = [
 		{ href: "#", label: "The Journey" },
 		{ href: "#", label: "About" },
@@ -11,6 +11,7 @@ async function PublicLayout({ children }: Readonly<{ children: ReactNode }>) {
 	];
 	const user = await getProfileData();
 	const session = await auth();
+
 	if (session?.user) {
 		navlinks.push({ href: `/${session.user.role}/dashboard`, label: "Dashboard" });
 	}
@@ -21,4 +22,4 @@ async function PublicLayout({ children }: Readonly<{ children: ReactNode }>) {
 		</>
 	);
 }
-export default PublicLayout;
+export default ProfileLayout;

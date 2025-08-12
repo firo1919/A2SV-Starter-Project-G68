@@ -21,7 +21,13 @@ export const adminApi = createApi({
 		}),
 		activateCycle: builder.mutation<RouteHandlerResponse, { id: string }>({
 			query: (data) => ({
-				url: `application_cycle/${data.id}`,
+				url: `application_cycle/${data.id}/activate`,
+				method: "PATCH",
+			}),
+		}),
+		deActivateCycle: builder.mutation<RouteHandlerResponse, { id: string }>({
+			query: (data) => ({
+				url: `application_cycle/${data.id}/deactivate`,
 				method: "PATCH",
 			}),
 		}),
@@ -54,4 +60,13 @@ export const adminApi = createApi({
 	}),
 });
 
-export const {useActivateCycleMutation, useCreateCycleMutation, useCreateUserMutation, useDeleteCycleMutation, useDeleteUserMutation, useUpdateCycleMutation, useUpdateUserMutation} = adminApi;
+export const {
+	useActivateCycleMutation,
+	useDeActivateCycleMutation,
+	useCreateCycleMutation,
+	useCreateUserMutation,
+	useDeleteCycleMutation,
+	useDeleteUserMutation,
+	useUpdateCycleMutation,
+	useUpdateUserMutation,
+} = adminApi;

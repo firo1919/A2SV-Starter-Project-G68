@@ -25,7 +25,13 @@ export default auth((req) => {
 		return Response.redirect(newUrl);
 	}
 	if (isAuthenticated && !isPublicRoute) {
-		if (role && !req.nextUrl.pathname.startsWith(rolePaths[role as keyof typeof rolePaths])) {
+		if (
+			role &&
+			!(
+				req.nextUrl.pathname.startsWith(rolePaths[role as keyof typeof rolePaths]) ||
+				req.nextUrl.pathname.startsWith("/profile")
+			)
+		) {
 			return Response.redirect(new URL("/denied", req.nextUrl.origin));
 		}
 	}
