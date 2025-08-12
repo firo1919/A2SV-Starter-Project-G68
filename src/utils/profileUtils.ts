@@ -14,10 +14,10 @@ interface ProfileResponse {
 }
 export async function getProfileData() {
 	const session = await auth();
-	if (!session?.user.accessToken) {
-		throw "User not authenticated";
-	}
 	try {
+		if (!session?.user.accessToken) {
+			throw "User not authenticated";
+		}
 		const response = await fetch(`${baseUrl}/profile/me`, {
 			method: "GET",
 			headers: {
@@ -28,7 +28,6 @@ export async function getProfileData() {
 		const data: ProfileResponse = await response.json();
 		return data;
 	} catch (error) {
-		console.log(error);
-		throw "Error occured during fetching profile";
+		console.log("Error occured during fetching profile", error);
 	}
 }
