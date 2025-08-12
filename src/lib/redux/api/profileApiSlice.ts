@@ -1,6 +1,6 @@
 import { RouteHandlerResponse } from "@/types/RouteHandler";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ChangePassword, UpdateProfile } from "../types/profiles";
+import { ChangePassword } from "../types/profiles";
 export const profilesApi = createApi({
 	reducerPath: "profilesApi",
 	baseQuery: fetchBaseQuery({ baseUrl: "/api/profile/me/" }),
@@ -18,7 +18,7 @@ export const profilesApi = createApi({
 				body: data,
 			}),
 		}),
-		updateProfile: builder.mutation<RouteHandlerResponse, UpdateProfile>({
+		updateProfile: builder.mutation<RouteHandlerResponse, FormData>({
 			query: (data) => ({
 				url: "change-password",
 				method: "PUT",
