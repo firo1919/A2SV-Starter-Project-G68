@@ -13,7 +13,7 @@ const HomePage = () => {
 					height={400}
 					priority
 				/>
-				<div className="absolute left-0 top-0 bg-black/40 flex flex-col justify-center p-5 w-full h-full">
+				<div className="absolute left-0 top-0 bg-black/40 flex flex-col justify-center p-5 w-full h-full px-90">
 					<h1 className="text-white text-2xl md:text-4xl lg:text-5xl font-bold mb-4 max-w-4xl">
 						Forge Your Future in Tech
 					</h1>
