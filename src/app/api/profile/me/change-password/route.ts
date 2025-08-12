@@ -33,6 +33,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse<RouteHandler
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
+				Accept: "application/json",
 				Authorization: `Bearer ${session.user.accessToken}`,
 			},
 			body: JSON.stringify({ old_password, new_password }),
