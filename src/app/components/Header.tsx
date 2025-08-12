@@ -54,7 +54,7 @@ function Header({ navlinks, fullName }: Props) {
 	return (
 		<header className="bg-white-80">
 			<div className="max-w-5xl w-9/10 mx-auto h-16 flex items-center justify-between">
-				<Link href="/">
+				<Link href="/home">
 					<Image
 						className="w-20 md:w-32 h-auto"
 						src="/images/a2sv-logo2.png"

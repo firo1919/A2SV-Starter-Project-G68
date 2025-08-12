@@ -1,11 +1,12 @@
-import React from "react";
-import HomePage from "@/app/components/HomePage";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
-const page = () => {
-	return (
-		<div>
-			<HomePage />
-		</div>
-	);
+const page = async () => {
+	const session = await auth();
+	if (session?.user) {
+		redirect(`/${session.user.role}/dashboard`);
+	} else {
+		redirect("/home");
+	}
 };
 export default page;

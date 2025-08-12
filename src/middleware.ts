@@ -8,6 +8,7 @@ const publicRoutes = [
 	"/reset-password",
 	"/denied",
 	"/successfull-reset",
+	"/home",
 ];
 const rolePaths = {
 	applicant: "/applicant",
