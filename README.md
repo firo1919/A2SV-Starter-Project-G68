@@ -76,7 +76,7 @@ A system designed to replace A2SVs application process, its a complete, responsi
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Running Tests
-- It is currently inprogresss ...
+_It is currently inprogresss ..._
 
 ### Unit Tests (Jest)
 
@@ -111,12 +111,33 @@ npm run cypress:open
 
 ### - Applicant Form
 
-<img width="1311" height="994" alt="screencapture-localhost-3000-applicant-create-application-2025-08-12-10_59_00" src="https://github.com/user-attachments/assets/e08775ee-bc40-4931-b821-54d1c9a6e05a" />
+<img width="1318" height="994" alt="screencapture-localhost-3000-applicant-create-application-2025-08-12-12_00_55(1)" src="https://github.com/user-attachments/assets/9091e177-b3f9-4075-ae0b-9c78e6da2785" />
+
+
+### - Applicant Progress 
+
+<img width="1314" height="1069" alt="screencapture-localhost-3000-applicant-progress-2025-08-12-10_56_50" src="https://github.com/user-attachments/assets/4dceae8e-d6da-4dd3-85d4-1579a18d95a4" />
+
 
 ### - Admin Dashboard 
 
 <img width="1366" height="1220" alt="screencapture-localhost-3000-admin-dashboard-2025-08-12-10_47_52" src="https://github.com/user-attachments/assets/c2c094ae-0b19-4eb7-8d33-67ae392a75fd" />
 
+### - Admin Application Cycle Page
+
+<img width="1366" height="1020" alt="screencapture-localhost-3000-admin-cycles-2025-08-12-10_50_11" src="https://github.com/user-attachments/assets/a1e6b928-ad0b-40b7-9c68-8e85746662ec" />
+
+### - Manager Dashboard
+
+![dashboard(1)](https://github.com/user-attachments/assets/6cc5f2cf-680b-4f5f-a441-183862a785e6)
+
+### - Manager Applicant Profile Page
+
+![profile(1)](https://github.com/user-attachments/assets/becdbf42-3ff7-441f-b5e3-c1fb459b1132)
+
+### - Reviewer Dashboard 
+
+<img width="1318" height="677" alt="screencapture-localhost-3000-reviewer-dashboard-2025-08-12-10_44_30" src="https://github.com/user-attachments/assets/d2c1afc3-9e21-42b1-b510-23c67d468ac0" />
 
 
 
