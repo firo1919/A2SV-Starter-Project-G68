@@ -5,9 +5,9 @@ import Header from "../components/Header";
 
 async function PublicLayout({ children }: Readonly<{ children: ReactNode }>) {
 	const navlinks = [
-		{ href: "#", label: "The Journey" },
-		{ href: "#", label: "About" },
-		{ href: "#", label: "Testimonials" },
+		{ href: "#thejourney", label: "The Journey" },
+		{ href: "#about", label: "About" },
+		{ href: "#testimonials", label: "Testimonials" },
 	];
 	const user = await getProfileData();
 	const session = await auth();
