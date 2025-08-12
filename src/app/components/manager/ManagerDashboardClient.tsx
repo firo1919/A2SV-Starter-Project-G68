@@ -15,7 +15,7 @@ import type {
   AvailableReviewer,
   TeamMemberPerformance,
   ApplicationStatusAPI,
-} from "@/app/(main)/manager/manager_dashboard/page"
+} from "@/app/(main)/manager/dashboard/page"
 import { useAssignReviewerMutation } from "@/lib/redux/api/managerApiSlice"
 
 interface DashboardStats {
