@@ -1,130 +1,195 @@
 "use client";
-import { useApplicantProfile } from "./ProfileContext";
-import { useEffect, useMemo, useState } from "react";
+import { useApplicantProfile } from "@/app/components/profile/ProfileContext";
+import { useEffect, useState, useRef } from "react";
+import { z } from "zod";
 
-interface RawProfile {
-	fullName?: string;
-	full_name?: string;
-	email?: string;
-	role?: string;
-	avatar_url?: string;
-	banner_url?: string;
-	avatarUrl?: string;
-	bannerUrl?: string;
+interface FormState {
+	full_name: string;
+	email: string;
 }
 
 export default function YourProfileForm() {
-	const raw = useApplicantProfile() as RawProfile | null;
-
-	const resolved = useMemo(() => {
-		if (!raw) return null;
-		return {
-			full_name: (raw.full_name || raw.fullName || "").trim(),
-			email: (raw.email || "").trim(),
-			role: (raw.role || "").trim(),
-		};
-	}, [raw?.full_name, raw?.fullName, raw?.email, raw?.role]);
-
-	const [form, setForm] = useState({ full_name: "", email: "", role: "" });
+	const profile = useApplicantProfile();
+	const [form, setForm] = useState<FormState>({ full_name: "", email: "" });
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
+	const [pw, setPw] = useState({ current: "", next: "", confirm: "" });
+	const [pwErr, setPwErr] = useState<string | null>(null);
+	const [pwMsg, setPwMsg] = useState<string | null>(null);
+	const [pwSaving, setPwSaving] = useState(false);
+	const [initialized, setInitialized] = useState(false);
+
+	const ProfileUpdateSchema = z.object({
+		full_name: z.string().trim().min(2, "Full name must be at least 2 characters"),
+		email: z.string().trim().email("Invalid email address"),
+	});
+
+	const PasswordChangeSchema = z
+		.object({
+			current: z.string().min(1, "Current password is required"),
+			next: z.string().min(8, "New password must be at least 8 characters"),
+			confirm: z.string().min(1, "Confirm password is required"),
+		})
+		.superRefine((vals, ctx) => {
+			if (vals.next === vals.current) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: "New password must be different",
+					path: ["next"],
+				});
+			}
+			if (vals.next !== vals.confirm) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					message: "Passwords do not match",
+					path: ["confirm"],
+				});
+			}
+		});
 
 	useEffect(() => {
-		if (resolved) setForm(resolved);
-	}, [resolved?.full_name, resolved?.email, resolved?.role]);
+		if (profile && !initialized) {
+			setForm({
+				full_name: profile.full_name ?? "",
+				email: profile.email ?? "",
+			});
+			orig.current = {
+				full_name: profile.full_name ?? "",
+				email: profile.email ?? "",
+			};
+			setInitialized(true);
+		}
+	}, [profile, initialized]);
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setForm((s) => ({ ...s, [name]: value }));
+	};
+
+	const orig = useRef<{ full_name: string; email: string }>({ full_name: "", email: "" });
+	useEffect(() => {
+		if (profile) {
+			orig.current = {
+				full_name: profile.full_name || "",
+				email: profile.email || "",
+			};
+		}
+	}, [profile?.full_name, profile?.email]);
+
+	const dirty = form.full_name.trim() !== orig.current.full_name || form.email.trim() !== orig.current.email;
+
+	async function onSubmitProfile(e: React.FormEvent) {
+		e.preventDefault();
 		setError(null);
 		setSuccess(null);
-		const { name, value } = e.target;
-		setForm((f) => ({ ...f, [name]: value }));
-	};
 
-	const diffPayload = () => {
-		if (!resolved) return null;
-		const p: Record<string, any> = {};
-		if (form.full_name !== resolved.full_name) p.full_name = form.full_name;
-		if (form.role !== resolved.role) p.role = form.role;
-		if (resolved.email) p.email = resolved.email;
-		return Object.keys(p).length ? p : null;
-	};
-
-	const onSubmitProfile = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!resolved) return;
-		const payload = diffPayload();
-		if (!payload) {
-			setSuccess("No changes to save.");
+		if (!profile) {
+			setError("Profile not loaded");
 			return;
 		}
+
+		const parsed = ProfileUpdateSchema.safeParse({
+			full_name: form.full_name,
+			email: form.email,
+		});
+		if (!parsed.success) {
+			setError(parsed.error.issues[0].message);
+			return;
+		}
+
+		const nothingChanged =
+			parsed.data.full_name.trim() === orig.current.full_name && parsed.data.email.trim() === orig.current.email;
+
+		if (nothingChanged) {
+			setSuccess("No changes to save");
+			return;
+		}
+
+		const fd = new FormData();
+		if (parsed.data.full_name.trim() !== orig.current.full_name) fd.set("full_name", parsed.data.full_name.trim());
+		if (parsed.data.email.trim() !== orig.current.email) fd.set("email", parsed.data.email.trim());
+
+		if ([...fd.keys()].length === 0) {
+			setSuccess("No changes to save");
+			return;
+		}
+
 		setSaving(true);
 		try {
-			const res = await fetch("/api/profile/me", {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(payload),
-			});
-			const json = await res.json();
-			if (!res.ok || !json.success) throw new Error(json.message || "Save failed");
-			setSuccess("Changes saved.");
-		} catch (e: any) {
-			setError(e.message || "Save error");
+			const res = await fetch("/api/profile", { method: "PUT", body: fd });
+			const ct = res.headers.get("content-type") || "";
+			const json = ct.includes("application/json") ? await res.json().catch(() => ({})) : {};
+			if (!res.ok || json.success === false) throw new Error(json.message || `Update failed (${res.status})`);
+			setSuccess("Profile updated successfully");
+			orig.current = {
+				full_name: parsed.data.full_name.trim(),
+				email: parsed.data.email.trim(),
+			};
+		} catch (err: any) {
+			setError(err.message || "Update failed");
 		} finally {
 			setSaving(false);
 		}
-	};
-
-	// Password form (placeholder)
-	const [pw, setPw] = useState({ current: "", next: "", confirm: "" });
-	const [pwSaving, setPwSaving] = useState(false);
-	const [pwErr, setPwErr] = useState<string | null>(null);
-	const [pwMsg, setPwMsg] = useState<string | null>(null);
+	}
 
 	const onPwChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPwErr(null);
-		setPwMsg(null);
 		const { name, value } = e.target;
-		setPw((p) => ({ ...p, [name]: value }));
+		setPw((s) => ({ ...s, [name]: value }));
 	};
 
-	const onSubmitPassword = async (e: React.FormEvent) => {
+	async function onSubmitPassword(e: React.FormEvent) {
 		e.preventDefault();
-		if (!pw.current || !pw.next || !pw.confirm) {
-			setPwErr("All fields required.");
+		setPwErr(null);
+		setPwMsg(null);
+
+		const parsed = PasswordChangeSchema.safeParse(pw);
+		if (!parsed.success) {
+			setPwErr(parsed.error.issues[0].message);
 			return;
 		}
-		if (pw.next !== pw.confirm) {
-			setPwErr("Passwords do not match.");
-			return;
-		}
+
 		setPwSaving(true);
 		try {
-			await new Promise((r) => setTimeout(r, 600));
-			setPwMsg("Password updated (placeholder).");
+			const res = await fetch("/api/profile/me/change-password", {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					old_password: parsed.data.current,
+					new_password: parsed.data.next,
+				}),
+			});
+			const ct = res.headers.get("content-type") || "";
+			const json = ct.includes("application/json") ? await res.json().catch(() => ({})) : {};
+			if (!res.ok || json.success === false) {
+				throw new Error(json.message || `Password update failed (${res.status})`);
+			}
+			setPwMsg("Password updated successfully");
 			setPw({ current: "", next: "", confirm: "" });
-		} catch {
-			setPwErr("Password change failed.");
+		} catch (err: any) {
+			setPwErr(err.message || "Password update failed");
 		} finally {
 			setPwSaving(false);
 		}
-	};
+	}
+
+	useEffect(() => {
+		if (success) {
+			const t = setTimeout(() => setSuccess(null), 4000);
+			return () => clearTimeout(t);
+		}
+	}, [success]);
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-6">
-			<h2 className="text-xl font-semibold mb-6">Personal Information</h2>
-
-			<form onSubmit={onSubmitProfile} id="profile-form" className="flex flex-col gap-6">
-				{error && <div className="text-sm text-red-600">{error}</div>}
-				{success && <div className="text-sm text-green-600">{success}</div>}
-
+			<form onSubmit={onSubmitProfile} className="flex flex-col gap-6">
 				<div className="flex flex-col gap-1">
 					<label className="text-sm font-medium text-gray-700">Full Name</label>
 					<input
 						name="full_name"
-						value={form.full_name}
+						value={form.full_name ?? ""}
 						onChange={onChange}
-						disabled={saving || !resolved}
+						disabled={saving}
 						placeholder="Enter your full name"
 						className="w-full max-w-[515px] h-[44px] px-4 rounded-md border border-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
 					/>
@@ -134,32 +199,43 @@ export default function YourProfileForm() {
 					<label className="text-sm font-medium text-gray-700">Email</label>
 					<input
 						name="email"
-						value={form.email}
-						disabled
-						className="w-full max-w-[515px] h-[44px] px-4 rounded-md border border-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-100"
-					/>
-				</div>
-
-				<div className="flex flex-col gap-1">
-					<label className="text-sm font-medium text-gray-700">Role</label>
-					<input
-						name="role"
-						value={form.role}
+						value={form.email ?? ""}
 						onChange={onChange}
-						disabled={saving || !resolved}
-						placeholder="Enter your role"
+						disabled={saving}
+						placeholder="Enter your email"
 						className="w-full max-w-[515px] h-[44px] px-4 rounded-md border border-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60"
 					/>
 				</div>
 
 				<div className="w-full h-[62px] bg-[#F9FAFB] px-6 py-3 flex justify-end items-center rounded-md">
-					<button
-						type="submit"
-						disabled={saving || !resolved}
-						className="bg-[#4F46E5] text-white px-[17px] py-[9px] rounded-[6px] text-sm font-medium shadow-sm hover:bg-indigo-700 transition disabled:opacity-60"
-					>
-						{saving ? "Saving..." : "Save Change"}
-					</button>
+					<div className="flex items-center gap-4">
+						{success && !dirty && !saving && (
+							<span
+								className="flex items-center gap-1 text-green-600 text-sm font-medium"
+								aria-live="polite"
+							>
+								<svg
+									className="w-4 h-4"
+									viewBox="0 0 20 20"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+								>
+									<path d="M16 6L8.5 13.5L5 10" strokeLinecap="round" strokeLinejoin="round" />
+								</svg>
+								Saved
+							</span>
+						)}
+						<button
+							type="submit"
+							disabled={saving || !dirty}
+							className={`bg-[#4F46E5] text-white px-[17px] py-[9px] rounded-[6px] text-sm font-medium shadow-sm transition ${
+								saving || !dirty ? "opacity-60 cursor-not-allowed" : "hover:bg-indigo-700"
+							}`}
+						>
+							{saving ? "Saving..." : dirty ? "Save Changes" : success ? "Saved" : "No Changes"}
+						</button>
+					</div>
 				</div>
 			</form>
 
@@ -176,9 +252,11 @@ export default function YourProfileForm() {
 						value={pw.current}
 						onChange={onPwChange}
 						placeholder="Enter current password"
+						disabled={pwSaving}
 						className="w-full max-w-[515px] h-[44px] px-4 rounded-md border border-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
+
 				<div className="flex flex-col gap-1">
 					<label className="text-sm font-medium text-gray-700">New Password</label>
 					<input
@@ -187,9 +265,11 @@ export default function YourProfileForm() {
 						value={pw.next}
 						onChange={onPwChange}
 						placeholder="Enter new password"
+						disabled={pwSaving}
 						className="w-full max-w-[515px] h-[44px] px-4 rounded-md border border-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
+
 				<div className="flex flex-col gap-1">
 					<label className="text-sm font-medium text-gray-700">Confirm New Password</label>
 					<input
@@ -198,9 +278,11 @@ export default function YourProfileForm() {
 						value={pw.confirm}
 						onChange={onPwChange}
 						placeholder="Confirm new password"
+						disabled={pwSaving}
 						className="w-full max-w-[515px] h-[44px] px-4 rounded-md border border-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
 				</div>
+
 				<div className="w-full h-[62px] bg-[#F9FAFB] px-6 py-3 flex justify-end items-center rounded-md">
 					<button
 						type="submit"
