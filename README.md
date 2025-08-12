@@ -76,6 +76,7 @@ A system designed to replace A2SVs application process, its a complete, responsi
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Running Tests
+- It is currently inprogresss ...
 
 ### Unit Tests (Jest)
 
@@ -98,7 +99,26 @@ npm run cypress:open
 
 ## Screenshots
 
-_Screenshots will be added as the application develops_
+### - Home page 
+  ![photo_2025-08-12_11-21-33(1)](https://github.com/user-attachments/assets/994623f7-ad82-48a0-8ed2-0bf099ef8b7c)
+  
+### - Login Page
+<img width="1315" height="914" alt="screencapture-localhost-3000-login-2025-08-12-10_19_49" src="https://github.com/user-attachments/assets/29b1855a-e61a-455a-913a-8ae9220a449d" />
+
+### - Applicant Dashboard
+
+<img width="1315" height="981" alt="screencapture-localhost-3000-applicant-dashboard-2025-08-12-11_28_02 (1)(1)" src="https://github.com/user-attachments/assets/4f7de421-b299-4f5d-9964-71f9de564863" />
+
+### - Applicant Form
+
+<img width="1311" height="994" alt="screencapture-localhost-3000-applicant-create-application-2025-08-12-10_59_00" src="https://github.com/user-attachments/assets/e08775ee-bc40-4931-b821-54d1c9a6e05a" />
+
+### - Admin Dashboard 
+
+<img width="1366" height="1220" alt="screencapture-localhost-3000-admin-dashboard-2025-08-12-10_47_52" src="https://github.com/user-attachments/assets/c2c094ae-0b19-4eb7-8d33-67ae392a75fd" />
+
+
+
 
 ## Contributing
 
