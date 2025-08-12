@@ -4,7 +4,8 @@ export interface CycleType {
   start_date: string
   end_date: string
   is_active: boolean
-  created_at: string
+  created_at: string,
+  description: string
 }
 
 export interface UsersType {
@@ -12,7 +13,26 @@ export interface UsersType {
     full_name: string,
     email: string,
     role: string,
-    is_active: boolean
+    is_active: boolean,
+    profile_picture: string
+}
+
+export interface AnalyticsType {
+    total_applicants: number,
+    acceptance_rate: number,
+    average_review_time_days: number,
+    application_funnel: {
+      pending_review: number,
+      in_progress: number,
+    },
+    school_distribution: Record<string, number>;
+    country_distribution: Record<string, number>;
+}
+
+export interface AnalyticsResponseType {
+  success: boolean,
+  data: AnalyticsType,
+  message: string
 }
 
 export interface CycleResponseType {
@@ -36,3 +56,15 @@ export interface UsersResponseType {
     },
     message: string
 }
+
+export interface ActiveCyclesResponse {
+  success: boolean,
+  data: {
+    cycles: CycleType,
+    total_count: number,
+    page: number,
+    limit: number
+  },
+  message: string
+}
+

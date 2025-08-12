@@ -1,13 +1,5 @@
-"use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-	const router = useRouter();
-
-	useEffect(() => {
-		router.push("/applicant/dashboard");
-	}, [router]);
-
-	return null;
+export default async function Page() {
+	redirect("/applicant/dashboard");
 }
