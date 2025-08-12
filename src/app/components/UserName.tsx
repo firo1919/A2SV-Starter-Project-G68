@@ -1,7 +1,9 @@
-import { getProfileData } from "@/utils/profileUtils";
+"use client";
 
-async function UserName() {
-	const user = await getProfileData();
-	return <p className="text-sm font-semibold text-gray-600">{user.data.full_name}</p>;
+interface UserNameProps {
+	fullName: string;
 }
-export default UserName;
+
+export default function UserName({ fullName }: UserNameProps) {
+	return <p className="text-sm font-semibold text-gray-600">{fullName}</p>;
+}
