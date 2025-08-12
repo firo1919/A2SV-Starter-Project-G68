@@ -137,7 +137,8 @@ npm run cypress:open
 
 ### - Reviewer Dashboard 
 
-<img width="1318" height="677" alt="screencapture-localhost-3000-reviewer-dashboard-2025-08-12-10_44_30" src="https://github.com/user-attachments/assets/d2c1afc3-9e21-42b1-b510-23c67d468ac0" />
+![photo_2025-08-12_18-03-02(1)](https://github.com/user-attachments/assets/db491fef-ead3-4b1e-a602-fe5737b6c893)
+
 
 
 
