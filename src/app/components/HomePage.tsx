@@ -138,21 +138,19 @@ const HomePage = () => {
 
 			<div
 				id="about"
-				className="flex flex-col lg:flex-row gap-5 mb-12 sm:mb-15 px-4 sm:px-6 md:px-8 lg:px-28 xl:px-32 py-8 sm:py-10 justify-center items-center"
+				className="flex flex-col lg:flex-row gap-5 mb-15 px-4 md:px-8 lg:px-12 py-10 justify-center"
 			>
-				<div className="lg:w-1/2 lg:pr-8 text-center lg:text-left">
-					<h1 className="text-black font-bold text-lg sm:text-xl md:text-2xl mb-4">
-						Built by Engineers, for Engineers
-					</h1>
-					<p className="text-gray-500 text-sm sm:text-base">
+				<div className="lg:ml-50 lg:mt-40 lg:w-130 lg:mr-7 mb-10 lg:mb-20 text-center lg:text-left">
+					<h1 className="text-black font-bold text-xl md:text-2xl mb-4">Built by Engineers, for Engineers</h1>
+					<p className="text-gray-500 text-sm md:text-base">
 						A2SV is not just a program, it&apos;s a community. We&apos;re on a mission to identify
 						Africa&apos;s most brilliant minds and provide them with the tools to solve humanity&apos;s
 						greatest challenges.
 					</p>
 				</div>
-				<div className="lg:w-1/2 flex justify-center">
+				<div className="flex justify-center lg:justify-start">
 					<Image
-						className="h-auto max-w-md lg:max-w-lg"
+						className="max-w-full h-auto"
 						src="/images/main-image.png"
 						alt="main-image"
 						width={420}
