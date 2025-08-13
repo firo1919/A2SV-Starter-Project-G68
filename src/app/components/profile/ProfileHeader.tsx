@@ -52,26 +52,31 @@ export default function ProfileHeader() {
 	}
 
 	return (
-		<div className="relative w-full h-[256px] rounded-lg my-8">
+		<div className="relative w-full h-[256px] rounded-lg my-8 mb-8">
 			<Image src={banner} alt="Banner" fill priority className="rounded-lg object-cover" />
 			<div className="absolute -bottom-22 left-6 flex items-center gap-6">
 				<button
 					type="button"
 					onClick={pickFile}
-					className="relative group focus:outline-none rounded-full"
+					className="relative group focus:outline-none"
 					aria-label="Change profile picture"
 					title="Change profile picture"
 				>
-					<Image
-						src={preview || PLACEHOLDER}
-						alt="Profile"
-						width={128}
-						height={128}
-						className="rounded-full border-4 border-white shadow-lg object-cover transition group-hover:brightness-90"
-					/>
-					<span className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 text-white text-xs font-medium">
-						Change
-					</span>
+					<div className="relative w-32 h-32 rounded-full bg-white p-1 shadow-lg">
+						<div className="relative w-full h-full rounded-full overflow-hidden">
+							<Image
+								src={preview || PLACEHOLDER}
+								alt="Profile"
+								fill
+								sizes="128px"
+								className="object-cover select-none"
+								priority
+							/>
+							<div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-medium transition">
+								Change
+							</div>
+						</div>
+					</div>
 				</button>
 				<input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
 				<div className="flex flex-col">
